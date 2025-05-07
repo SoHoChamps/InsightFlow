@@ -35,7 +35,7 @@ function showBotMessage(msg, isTyping = false) {
 
   botBubble.innerHTML = `
     <div class="bot-avatar">
-      <img src="Bot.jpg" alt="Bot Avatar" />
+      <img src="Bot.png" alt="Bot Avatar" />
     </div>
     <div class="bot-text">
       <strong>InsightFlow:</strong>
