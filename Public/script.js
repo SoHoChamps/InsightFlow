@@ -16,15 +16,6 @@ const interviewScript = [
   { type: 'text', key: 'contextLocation', question: "Where were you when you used the product?" },
   { type: 'text', key: 'contextOthers', question: "Was anyone else involved in the decision or experience?" },
   { type: 'text', key: 'discovery', question: "How did you first hear about this product?" },
-  { type: 'text', key: 'reasonChosen', question: "Why did you choose this product over others?" },
-  { type: 'text', key: 'problemSolved', question: "What problem were you hoping to solve?" },
-  { type: 'text', key: 'emotionalReaction', question: "How did this product make you feel?" },
-  { type: 'text', key: 'frequency', question: "How often do you use it?" },
-  { type: 'text', key: 'timing', question: "At what time of day do you use this most?" },
-  { type: 'text', key: 'pairedProducts', question: "What other products do you use alongside it?" },
-  { type: 'text', key: 'oneWord', question: "If you could describe the product in one word, what would it be?" },
-  { type: 'text', key: 'threeWords', question: "What three words come to mind when you think of the brand?" },
-  { type: 'text', key: 'friendExplanation', question: "How would you explain this product to a friend?" },
   { type: 'end', message: "Thank you for your time! Your answers have been recorded." }
 ];
 
@@ -35,7 +26,7 @@ function showBotMessage(msg, isTyping = false) {
 
   botBubble.innerHTML = `
     <div class="bot-avatar">
-      <img src="Bot.png" alt="Bot Avatar" />
+      <img src="Pictures/Bot.jpg" alt="Bot Avatar" />
     </div>
     <div class="bot-text">
       <strong>InsightFlow:</strong>

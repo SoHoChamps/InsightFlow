@@ -7,11 +7,22 @@
   <link rel="stylesheet" href="dashboard.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .sidebar-logo {
+      width: 100%;
+      height: auto;
+    }
+    .bot-avatar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+  </style>
 </head>
 <body>
   <!-- Sidebar -->
   <aside class="sidebar">
-    <img src="InsightFlow logo.png" alt="InsightFlow Logo" class="sidebar-logo" />
+    <img src="Pictures/InsightFlow logo copy.png" alt="InsightFlow Logo" class="sidebar-logo" />
     <button class="sidebar-button">🏠 Home</button>
     <button class="sidebar-button">➕ Create</button>
     <button class="sidebar-button">📂 Browse</button>
@@ -108,11 +119,6 @@
         <div class="dashboard-card">
           <h3>Usage Contexts</h3>
           <canvas id="contextChart"></canvas>
-        </div>
-
-        <div class="dashboard-card">
-          <h3>Usage Frequency</h3>
-          <canvas id="usageChart" width="400" height="200"></canvas>
         </div>
 
         <!-- Emotional Reaction Chart -->

@@ -63,7 +63,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Extract responses
   const ratings = data.map(d => parseFloat(d.satisfaction)).filter(n => !isNaN(n));
   const usage = data.map(d => d.usage).filter(Boolean);
-  const emotional = data.map(d => d.emotionalReaction).filter(Boolean);
 
   // === KPI Cards ===
   const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length || 0;
@@ -71,11 +70,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById('totalInterviews').innerText = data.length;
 
   // Optional additional KPIs (if elements are added in HTML)
-  const topEmotion = Object.entries(countByValue(emotional)).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
   const topUse = Object.entries(countByValue(usage)).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
-  const emotionEl = document.getElementById('topEmotion');
   const topUseEl = document.getElementById('topUsage');
-  if (emotionEl) emotionEl.innerText = topEmotion;
   if (topUseEl) topUseEl.innerText = topUse;
 
   // === Charts ===
@@ -111,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       data: {
         labels: usageLabels,
         datasets: [{
-          label: 'Usage Frequency',
+          label: 'Usage',
           data: usageValues,
           backgroundColor: '#0074E0'
         }]
@@ -141,11 +137,9 @@ function updateKPIs(data) {
 
 function renderCharts(data) {
   const motivations = {};
-  const emotions = {};
 
   data.forEach(d => {
     if (d.reasonChosen) motivations[d.reasonChosen] = (motivations[d.reasonChosen] || 0) + 1;
-    if (d.emotionalReaction) emotions[d.emotionalReaction] = (emotions[d.emotionalReaction] || 0) + 1;
   });
 
   new Chart(document.getElementById('motivationChart'), {
@@ -153,14 +147,6 @@ function renderCharts(data) {
     data: {
       labels: Object.keys(motivations),
       datasets: [{ data: Object.values(motivations), label: "Motivations", backgroundColor: "#0074E0" }]
-    }
-  });
-
-  new Chart(document.getElementById('emotionChart'), {
-    type: 'pie',
-    data: {
-      labels: Object.keys(emotions),
-      datasets: [{ data: Object.values(emotions), backgroundColor: ['#0074E0', '#00FFE0', '#F9A826'] }]
     }
   });
 }
@@ -184,25 +170,6 @@ async function updateDashboardWithAnalyzedData() {
   const avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length || 0;
   document.getElementById('avgRating').innerText = avgRating.toFixed(2);
 
-  const emotions = data.filter(d => d.analysis.includes('emotionalReaction'));
-  const emotionCounts = emotions.reduce((acc, d) => {
-    const emotion = d.analysis;
-    acc[emotion] = (acc[emotion] || 0) + 1;
-    return acc;
-  }, {});
-
-  // Update charts
-  new Chart(document.getElementById('emotionChart'), {
-    type: 'pie',
-    data: {
-      labels: Object.keys(emotionCounts),
-      datasets: [{
-        data: Object.values(emotionCounts),
-        backgroundColor: ['#0074E0', '#00FFE0', '#F9A826']
-      }]
-    }
-  });
-
   const usage = data.filter(d => d.analysis.includes('usage'));
   const usageCounts = usage.reduce((acc, d) => {
     const use = d.analysis;
@@ -215,7 +182,7 @@ async function updateDashboardWithAnalyzedData() {
     data: {
       labels: Object.keys(usageCounts),
       datasets: [{
-        label: 'Usage Frequency',
+        label: 'Usage',
         data: Object.values(usageCounts),
         backgroundColor: '#0074E0'
       }]
