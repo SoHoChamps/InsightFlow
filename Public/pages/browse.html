@@ -1,0 +1,34 @@
+<div class="dashboard-content">
+    <h2>InsightFlow Files</h2>
+    <div class="file-grid">
+      <div class="file-card">📄 Interview_01.json</div>
+      <div class="file-card">📄 Summary_Report.docx</div>
+      <div class="file-card">📊 Q1_Sentiment.csv</div>
+      <div class="file-card">📁 User_Data_Backup/</div>
+      <div class="file-card">📄 Feedback_2025.txt</div>
+      <div class="file-card">📄 Chart_Data_March.csv</div>
+    </div>
+  </div>
+  
+  <style>
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .file-card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: left;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .file-card:hover {
+      background: #e6f2ff;
+    }
+  </style>
+  
