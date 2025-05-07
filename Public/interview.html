@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>InsightFlow Interview</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Onboarding Modal -->
+  <div id="onboardingModal" class="modal">
+    <div class="modal-content">
+      <p id="modalText"></p>
+      <div id="termsBlock" style="display: none;">
+        <a href="#" target="_blank">View Terms and Conditions and Privacy Policy</a><br><br>
+        <label>
+          <input type="checkbox" id="consentCheckbox" />
+          I agree to the terms and privacy policy
+        </label>
+      </div>
+      <button id="nextModalBtn">Next</button>
+    </div>
+  </div>
+
+  <!-- Logo + Tagline -->
+  <div class="top-banner">
+    <img src="InsightFlow logo.png" alt="InsightFlow Logo" class="logo" loading="lazy" />
+    <div class="banner-text">AI-powered research interviews made simple.</div>
+  </div>
+
+  <!-- Heading -->
+  <h1><span class="black">Insight</span><span class="blue">Flow</span> Chatbot Interview</h1>
+
+  <!-- Progress Indicator -->
+  <div id="progress" style="text-align:center; margin-bottom: 1rem;"></div>
+
+  <!-- Chat Display -->
+  <div id="chatbox"></div>
+  <div id="progress" style="text-align:center; margin-bottom: 1rem;"></div>
+
+  <!-- Input Field + Send Button -->
+  <div id="inputContainer">
+    <input type="text" id="userInput" placeholder="Type your answer..." />
+    <button id="sendButton">Send</button>
+  </div>
+
+  <!-- Multiple Choice Options -->
+  <div id="optionButtons"></div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>

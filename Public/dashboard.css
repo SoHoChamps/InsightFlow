@@ -1,0 +1,426 @@
+/* === dashboard.css === */
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #f5fbff, #e6f7ff);
+    color: #1F2937;
+  }
+  
+  .dashboard-container {
+    display: flex;
+    height: 100vh;
+    margin: 80px 1rem 1rem 240px;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background-color: white; /* Change sidebar background to white */
+    color: black;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+    gap: 1.5rem;
+  }
+  
+  .sidebar-logo {
+    height: 150px;
+    width: auto;
+    margin-bottom: 2rem;
+  }
+  
+  .sidebar-icon {
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar-icon:hover {
+    background-color: #e0e0e0;
+  }
+
+  .sidebar-button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    background-color: #0074E0; /* Blue buttons */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .sidebar-button:hover {
+    background-color: #005bb5;
+  }
+  
+  /* Main content */
+  .main {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  .top-bar img.logo {
+    height: 150px;
+  }
+  
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  button.filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background-color: #0A2540;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-title .blue {
+    color: #0074E0;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* updated */
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  
+  .chart-placeholder {
+    height: 150px;
+    background: linear-gradient(to right, #edf6ff, #dcefff);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-container {
+      flex-direction: column;
+    }
+  
+    .sidebar {
+      flex-direction: row;
+      height: 60px;
+      width: 100%;
+      justify-content: space-around;
+    }
+  
+    .main {
+      padding: 1rem;
+    }
+  }
+
+  .topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .date-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hamburger-menu {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .dashboard-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .export-btn,
+  .apply-filters-btn,
+  .reset-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .export-btn,
+  .filters-btn,
+  .reset-btn,
+  .date-picker-btn {
+    background-color: #0074E0; /* Blue buttons */
+    color: white;
+    padding: 0.75rem; /* Match sidebar button size */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+
+  .export-btn:hover,
+  .filters-btn:hover,
+  .reset-btn:hover,
+  .date-picker-btn:hover {
+    background-color: #005bb5; /* Darker blue on hover */
+  }
+
+  .export-btn {
+    background-color: #0074E0;
+    color: white;
+  }
+
+  .apply-filters-btn {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .reset-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .export-btn:hover {
+    background-color: #005bb5;
+  }
+
+  .apply-filters-btn:hover {
+    background-color: #218838;
+  }
+
+  .reset-btn:hover {
+    background-color: #c82333;
+  }
+
+  .kpi-card {
+    background-color: #f9f9f9; /* Ensure consistent background color for all KPI cards */
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .dashboard-card {
+    background-color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .filters-btn {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .filters-btn:hover {
+    background-color: #218838;
+  }
+
+  .dashboard-content {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .topbar-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .hamburger-menu,
+  .date-picker-btn,
+  .export-btn,
+  .filters-btn,
+  .reset-btn {
+    background-color: #0A2540; /* Dark blue */
+    color: white;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+
+  .hamburger-menu:hover,
+  .date-picker-btn:hover,
+  .export-btn:hover,
+  .filters-btn:hover,
+  .reset-btn:hover {
+    background-color: #005bb5; /* Lighter dark blue on hover */
+  }
+
+  .topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  /* move this block to the right */
+  .topbar-controls {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* reduce space below header */
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem; /* previously was 1rem */
+  }
+
+  .kpi-card-extended, .chart-card-extended {
+    background-color: #f4f9ff;
+    border-radius: 10px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0, 116, 224, 0.15);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .kpi-card-extended:hover, .chart-card-extended:hover {
+    transform: translateY(-4px);
+  }
+  
+  .kpi-card-extended h4 {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #0A2540;
+  }
+  
+  .kpi-value-extended {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #0074E0;
+  }
+  
+  .chart-card-extended canvas {
+    max-width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+  }
+  
+  .section-subtitle {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0A2540;
+  }
+  
+  @keyframes fadeInKPI {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .fade-in-kpi {
+    animation: fadeInKPI 0.6s ease-in-out;
+  }
+
+  .dashboard-filters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.5rem auto;
+    width: 100%;
+    max-width: 1000px;
+    padding: 0 1rem;
+  }
+  
+  .dashboard-filters label {
+    font-weight: 600;
+  }
+  
+  .dashboard-filters select,
+  .dashboard-filters input[type="date"] {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }

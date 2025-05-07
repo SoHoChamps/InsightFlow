@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InsightFlow Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <img src="InsightFlow logo.png" alt="InsightFlow Logo" class="sidebar-logo" />
+    <button class="sidebar-button">🏠 Home</button>
+    <button class="sidebar-button">➕ Create</button>
+    <button class="sidebar-button">📂 Browse</button>
+    <button class="sidebar-button">📊 Data</button>
+    <button class="sidebar-button">📈 Metrics</button>
+    <button class="sidebar-button">🗂️ Workspace</button>
+    <button class="sidebar-button">📋 Dashboard</button>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="topbar-controls">
+        <button class="hamburger-menu">☰</button>
+        <button class="date-picker-btn">Date</button>
+        <button class="export-btn">Export</button>
+        <button class="filters-btn">Filters</button>
+        <button class="reset-btn">Reset</button>
+      </div>
+      <h1 class="dashboard-title">Insight<span class="blue">Flow</span> Dashboard</h1>
+    </header>
+
+    <div class="dashboard-filters">
+      <label for="countrySelect">Country:</label>
+      <select id="countrySelect">
+        <option value="All">All</option>
+      </select>
+    
+      <label for="genderSelect">Gender:</label>
+      <select id="genderSelect">
+        <option value="All">All</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    
+      <label for="dateInput">Date:</label>
+      <input type="date" id="dateInput" />
+    
+      <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
+      <button id="exportCsvBtn" class="export-btn">Export CSV</button>
+    </div>
+
+    <!-- KPI Section -->
+    <main class="dashboard-container">
+
+      <section class="dashboard-kpis">
+        <div class="kpi-card">
+          <h3>Avg. Product Rating</h3>
+          <p id="avgRating">--</p>
+        </div>
+        <div class="kpi-card">
+          <h3>Total Interviews</h3>
+          <p id="totalInterviews">--</p>
+        </div>
+        <div class="kpi-card">
+          <h3>Top Emotion</h3>
+          <p id="topEmotion">--</p>
+        </div>
+        <div class="kpi-card">
+          <h3>Most Common Use</h3>
+          <p id="topUsage">--</p>
+        </div>
+      </section>
+
+      <!-- Chart Section -->
+      <section class="dashboard-grid">
+        <div class="dashboard-card">
+          <h3>Sentiment Breakdown</h3>
+          <canvas id="sentimentChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Most Used Words</h3>
+          <div id="wordCloud">Coming soon</div>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>User Feedback Summary</h3>
+          <div id="feedbackSummary">Coming soon</div>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Top Motivations</h3>
+          <canvas id="motivationChart"></canvas>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Top Emotions</h3>
+          <canvas id="emotionChart"></canvas>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Usage Contexts</h3>
+          <canvas id="contextChart"></canvas>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Usage Frequency</h3>
+          <canvas id="usageChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Emotional Reaction Chart -->
+        <div class="dashboard-card">
+          <h3>Emotional Reactions</h3>
+          <canvas id="emotionChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Ethnicity Demographics Chart -->
+        <div class="dashboard-card">
+          <h3>Ethnicity Demographics</h3>
+          <canvas id="ethnicityChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Satisfaction Ratings Chart -->
+        <div class="dashboard-card">
+           <h3>Product Satisfaction (1–5)</h3>
+           <canvas id="satisfactionChart" width="400" height="200"></canvas>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
