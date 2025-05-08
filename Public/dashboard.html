@@ -136,6 +136,79 @@
           </section>
         </div>
       </div>
+
+      <!-- Consolidated Page Content -->
+      <div id="home-section" class="page-section">
+        <h2>Welcome to InsightFlow</h2>
+        <p>Your intelligent platform for analyzing user interview data.</p>
+        <section>
+          <h3>Our Mission</h3>
+          <p>To turn qualitative insights into actionable decisions through smart analytics and user-friendly tools.</p>
+        </section>
+        <section>
+          <h3>What We Do</h3>
+          <ul>
+            <li>📊 Collect and visualize sentiment data</li>
+            <li>🎯 Understand user motivations and emotions</li>
+            <li>📈 Help you make data-driven decisions faster</li>
+          </ul>
+        </section>
+      </div>
+
+      <div id="create-section" class="page-section" style="display: none;">
+        <h2>Create</h2>
+        <p>Welcome to the Create page. Add your content here.</p>
+      </div>
+
+      <div id="browse-section" class="page-section" style="display: none;">
+        <h2>InsightFlow Files</h2>
+        <div class="file-grid">
+          <div class="file-card">📄 Interview_01.json</div>
+          <div class="file-card">📄 Summary_Report.docx</div>
+          <div class="file-card">📊 Q1_Sentiment.csv</div>
+          <div class="file-card">📁 User_Data_Backup/</div>
+          <div class="file-card">📄 Feedback_2025.txt</div>
+          <div class="file-card">📄 Chart_Data_March.csv</div>
+        </div>
+      </div>
+
+      <div id="data-section" class="page-section" style="display: none;">
+        <h2>Raw Data Table</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Country</th>
+              <th>Gender</th>
+              <th>Satisfaction</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alice Johnson</td>
+              <td>USA</td>
+              <td>Female</td>
+              <td>4</td>
+              <td>2025-04-20</td>
+            </tr>
+            <tr>
+              <td>David Kim</td>
+              <td>South Korea</td>
+              <td>Male</td>
+              <td>5</td>
+              <td>2025-04-21</td>
+            </tr>
+            <tr>
+              <td>Maria García</td>
+              <td>Spain</td>
+              <td>Female</td>
+              <td>3</td>
+              <td>2025-04-22</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
 
     <!-- JavaScript to Handle Page Switching -->
@@ -159,10 +232,75 @@
       document.getElementById('btn-browse').addEventListener('click', () => showPage('browse'));
       document.getElementById('btn-data').addEventListener('click', () => showPage('data'));
       document.getElementById('btn-dashboard').addEventListener('click', () => showPage('dashboard'));
+
+      const sections = {
+        home: document.getElementById('home-section'),
+        create: document.getElementById('create-section'),
+        browse: document.getElementById('browse-section'),
+        data: document.getElementById('data-section')
+      };
+
+      function showSection(sectionId) {
+        Object.values(sections).forEach(section => section.style.display = 'none');
+        sections[sectionId].style.display = 'block';
+      }
+
+      document.getElementById('btn-home').addEventListener('click', () => showSection('home'));
+      document.getElementById('btn-create').addEventListener('click', () => showSection('create'));
+      document.getElementById('btn-browse').addEventListener('click', () => showSection('browse'));
+      document.getElementById('btn-data').addEventListener('click', () => showSection('data'));
     </script>
   </div>
 
   <!-- Main Dashboard JS -->
   <script src="dashboard.js"></script>
+
+  <style>
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .file-card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: left;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .file-card:hover {
+      background: #e6f2ff;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    .data-table th {
+      background-color: #0074E0;
+      color: white;
+    }
+
+    .data-table tr:nth-child(even) {
+      background-color: #f4f9ff;
+    }
+
+    .data-table tr:hover {
+      background-color: #e6f7ff;
+    }
+  </style>
 </body>
 </html>
