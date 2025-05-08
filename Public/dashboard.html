@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InsightFlow Dashboard</title>
+  <title>InsightFlow</title>
   <link rel="stylesheet" href="dashboard.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -27,8 +27,6 @@
     <button class="sidebar-button" id="btn-create">➕ Create</button>
     <button class="sidebar-button" id="btn-browse">📂 Browse</button>
     <button class="sidebar-button" id="btn-data">📊 Data</button>
-    <button class="sidebar-button" id="btn-metrics">📈 Metrics</button>
-    <button class="sidebar-button" id="btn-workspace">🗂️ Workspace</button>
     <button class="sidebar-button" id="btn-dashboard">📋 Dashboard</button>
   </aside>
 
@@ -38,12 +36,10 @@
     <header class="topbar">
       <div class="topbar-controls">
         <button class="hamburger-menu">☰</button>
-        <button class="date-picker-btn">Date</button>
-        <button class="export-btn">Export</button>
-        <button class="filters-btn">Filters</button>
-        <button class="reset-btn">Reset</button>
+        <button class="settings-btn">⚙️</button>
+        <button class="account-btn">👤</button>
       </div>
-      <h1 class="dashboard-title">Insight<span class="blue">Flow</span> Dashboard</h1>
+      <h1 class="dashboard-title">Insight<span class="blue">Flow</span></h1>
     </header>
 
     <!-- Dynamic Section -->
@@ -51,6 +47,7 @@
       <div id="dynamic-content">
         <!-- Default Dashboard View -->
         <div id="dashboard-view">
+          <h2 class="page-title">InsightFlow Dashboard</h2>
           <div class="dashboard-filters">
             <label for="countrySelect">Country:</label>
             <select id="countrySelect">
@@ -124,7 +121,7 @@
 
             <div class="dashboard-card">
               <h3>Emotional Reactions</h3>
-              <canvas id="emotionChart" width="400" height="200"></canvas>
+              <canvas id="emotionChart2" width="400" height="200"></canvas>
             </div>
 
             <div class="dashboard-card">
@@ -140,42 +137,32 @@
         </div>
       </div>
     </main>
+
+    <!-- JavaScript to Handle Page Switching -->
+    <script>
+      const contentArea = document.getElementById('dynamic-content');
+
+      const pageContent = {
+        home: '<h2>Home</h2><p>Welcome to the Home page!</p>',
+        create: '<h2>Create</h2><p>Welcome to the Create page. Add your content here.</p>',
+        browse: '<h2>Browse</h2><p>Welcome to the Browse page. Explore your options here.</p>',
+        data: '<h2>Data</h2><p>Welcome to the Data page. Analyze your data here.</p>',
+        dashboard: document.getElementById('dashboard-view').innerHTML
+      };
+
+      function showPage(pageId) {
+        contentArea.innerHTML = pageContent[pageId];
+      }
+
+      document.getElementById('btn-home').addEventListener('click', () => showPage('home'));
+      document.getElementById('btn-create').addEventListener('click', () => showPage('create'));
+      document.getElementById('btn-browse').addEventListener('click', () => showPage('browse'));
+      document.getElementById('btn-data').addEventListener('click', () => showPage('data'));
+      document.getElementById('btn-dashboard').addEventListener('click', () => showPage('dashboard'));
+    </script>
   </div>
 
   <!-- Main Dashboard JS -->
   <script src="dashboard.js"></script>
-
-  <script>
-    const contentArea = document.getElementById('dynamic-content');
-  
-    const routes = {
-      home: 'pages/home.html',
-      browse: 'pages/browse.html',
-      data: 'pages/data.html',
-      dashboard: null // Reloads default dashboard layout
-    };
-  
-    async function loadPage(path) {
-      if (!path) {
-        location.reload(); // fallback to full reload for dashboard
-        return;
-      }
-  
-      try {
-        const res = await fetch(path);
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const html = await res.text();
-        contentArea.innerHTML = html;
-      } catch (error) {
-        contentArea.innerHTML = `<p style="color:red;">Failed to load: ${path}</p>`;
-        console.error(error);
-      }
-    }
-  
-    document.getElementById('btn-home').addEventListener('click', () => loadPage(routes.home));
-    document.getElementById('btn-browse').addEventListener('click', () => loadPage(routes.browse));
-    document.getElementById('btn-data').addEventListener('click', () => loadPage(routes.data));
-    document.getElementById('btn-dashboard').addEventListener('click', () => loadPage(routes.dashboard));
-  </script>
 </body>
 </html>

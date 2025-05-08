@@ -114,8 +114,8 @@ body {
     font-size: 1.75rem;
     font-weight: 700;
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
   
   .dashboard-title .blue {
@@ -125,8 +125,7 @@ body {
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* updated */
-    gap: 1.5rem;
-    width: 100%;
+    gap: 1rem;
     margin-top: 1rem;
   }
   
@@ -203,16 +202,18 @@ body {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
-  }
-
-  .export-btn,
-  .apply-filters-btn,
-  .reset-btn {
-    padding: 0.5rem 1rem;
+  }  
+  
+  .export-btn {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-align: center;
+    background-color: #0074E0;
+    color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
   }
 
   .export-btn,
@@ -239,6 +240,12 @@ body {
   .export-btn {
     background-color: #0074E0;
     color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
   }
 
   .apply-filters-btn {
@@ -263,12 +270,27 @@ body {
     background-color: #c82333;
   }
 
+
+  .dashboard-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0 2rem;
+    box-sizing: border-box;
+    margin-top: 1rem;
+  }
+  
   .kpi-card {
-    background-color: #f9f9f9; /* Ensure consistent background color for all KPI cards */
+    background-color: #f9f9f9;
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .dashboard-card {
@@ -343,15 +365,6 @@ body {
     right: 2rem;
     display: flex;
     gap: 1rem;
-  }
-  
-  /* reduce space below header */
-  .dashboard-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    text-align: center;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem; /* previously was 1rem */
   }
 
   .kpi-card-extended, .chart-card-extended {

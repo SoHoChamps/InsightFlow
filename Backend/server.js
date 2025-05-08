@@ -12,7 +12,7 @@ const port = 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('Public'));
 
 // Initialize OpenAI (optional if only classifying)
 const configuration = new Configuration({
