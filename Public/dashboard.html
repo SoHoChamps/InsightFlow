@@ -9,9 +9,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     .sidebar-logo {
-      width: 100%;
-      height: auto;
+      height: 150px;
+      margin-bottom: 2rem;
+      max-height: 160px;
+      object-fit: contain;
     }
+    
     .bot-avatar img {
       width: 50px;
       height: 50px;
@@ -135,6 +138,30 @@
             <div class="dashboard-card">
               <h3>Product Satisfaction (1–5)</h3>
               <canvas id="satisfactionChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="dashboard-card">
+              <h3>Interview Responses</h3>
+              <div>
+                <button id="analyzeResponsesButton">Analyze All Responses</button>
+                <table id="response-table" class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Question</th>
+                      <th>Response</th>
+                      <th>Analysis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Rows will be dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="dashboard-card">
+              <h3>Response Chart</h3>
+              <canvas id="response-chart" width="400" height="200"></canvas>
             </div>
           </section>
         </div>
@@ -287,135 +314,11 @@
       </tbody>
     </table>
   </div>
-
-      <!-- Table for displaying interview responses -->
-  <div id="response-table-section" class="page-section" style="display: none;">
-    <h1>Interview Responses</h1>
-    <button id="analyzeResponsesButton">Analyze All Responses</button>
-    <table id="response-table" class="data-table">
-      <thead>
-        <tr>
-          <th>Question</th>
-          <th>Response</th>
-          <th>Analysis</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be dynamically populated -->
-      </tbody>
-    </table>
-    <canvas id="response-chart" width="400" height="200"></canvas>
-  </div>
-
-      <!-- Dashboard Section: Consolidated Page Content -->
-      <div id="dashboard-section" class="page-section" style="display: none;">
-        <h1>Dashboard</h1>
-        <p>Welcome to the InsightFlow Dashboard. Analyze your data with KPIs and visualizations.</p>
-
-        <!-- Filters for dashboard data -->
-        <div class="dashboard-filters">
-          <label for="countrySelect">Country:</label>
-          <select id="countrySelect">
-            <option value="All">All</option>
-          </select>
-
-          <label for="genderSelect">Gender:</label>
-          <select id="genderSelect">
-            <option value="All">All</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-
-          <label for="dateInput">Date:</label>
-          <input type="date" id="dateInput" />
-
-          <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
-          <button id="exportCsvBtn" class="export-btn">Export CSV</button>
-        </div>
-
-        <!-- Key Performance Indicators (KPIs) -->
-        <section class="dashboard-kpis">
-          <div class="kpi-card">
-            <h3>Avg. Product Rating</h3>
-            <p id="avgRating">--</p>
-          </div>
-          <div class="kpi-card">
-            <h3>Total Interviews</h3>
-            <p id="totalInterviews">--</p>
-          </div>
-          <div class="kpi-card">
-            <h3>Top Emotion</h3>
-            <p id="topEmotion">--</p>
-          </div>
-          <div class="kpi-card">
-            <h3>Most Common Use</h3>
-            <p id="topUsage">--</p>
-          </div>
-        </section>
-
-        <!-- Charts and visualizations -->
-        <section class="dashboard-grid">
-          <div class="dashboard-card">
-            <h3>Sentiment Breakdown</h3>
-            <canvas id="sentimentChart" width="400" height="200"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Most Used Words</h3>
-            <div id="wordCloud">Coming soon</div>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>User Feedback Summary</h3>
-            <div id="feedbackSummary">Coming soon</div>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Top Motivations</h3>
-            <canvas id="motivationChart"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Top Emotions</h3>
-            <canvas id="emotionChart"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Usage Contexts</h3>
-            <canvas id="contextChart"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Emotional Reactions</h3>
-            <canvas id="emotionChart2" width="400" height="200"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Ethnicity Demographics</h3>
-            <canvas id="ethnicityChart" width="400" height="200"></canvas>
-          </div>
-
-          <div class="dashboard-card">
-            <h3>Product Satisfaction (1–5)</h3>
-            <canvas id="satisfactionChart" width="400" height="200"></canvas>
-          </div>
-        </section>
-      </div>
     </main>
 
     <!-- JavaScript to Handle Page Switching -->
     <script>
       const contentArea = document.getElementById('dynamic-content');
-
-      const pageContent = {
-        // Removed unused messages for home, create, browse, and data pages
-        // home: '<h2>Home</h2><p>Welcome to the Home page!</p>',
-        // create: '<h2>Create</h2><p>Welcome to the Create page. Add your content here.</p>',
-        // browse: '<h2>Browse</h2><p>Welcome to the Browse page. Explore your options here.</p>',
-        // data: '<h2>Data</h2><p>Welcome to the Data page. Analyze your data here.</p>',
-        dashboard: document.getElementById('dashboard-view').innerHTML
-      };
 
       // Ensure the dashboard button displays all dashboard content
       function showPage(pageId) {
