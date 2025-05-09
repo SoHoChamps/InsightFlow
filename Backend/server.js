@@ -195,7 +195,6 @@ app.post('/classify', async (req, res) => {
 // Save interview responses
 app.post('/save-interview', (req, res) => {
   const newEntry = req.body;
-  const filePath = './Backend/data/interviews.json';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     const allData = data ? JSON.parse(data) : [];
@@ -214,7 +213,6 @@ app.post('/save-interview', (req, res) => {
 // Save responses
 app.post('/save', (req, res) => {
   const newEntry = req.body;
-  const filePath = './Backend/data/interviews.json';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     const allData = data ? JSON.parse(data) : [];
