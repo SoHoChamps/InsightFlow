@@ -323,3 +323,82 @@ window.onload = function () {
 
   document.getElementById('sendButton').addEventListener('click', sendMessage);
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const interviewResponses = [];
+
+  // Function to add a question-response pair to the array
+  function addResponse(question, answer) {
+    interviewResponses.push({ question, answer });
+  }
+
+  // Function to send all responses to the server
+  function completeInterview() {
+    const payload = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      responses: interviewResponses,
+    };
+
+    fetch('/save-response', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save responses');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Interview responses saved:', data);
+        // Clear the array after successful save
+        interviewResponses.length = 0;
+        showStartNewInterviewButton();
+      })
+      .catch(error => {
+        console.error('Error saving responses:', error);
+      });
+  }
+
+  // Function to show the "Start New Interview" button
+  function showStartNewInterviewButton() {
+    const chatbox = document.getElementById('chatbox');
+    const newInterviewButton = document.createElement('button');
+    newInterviewButton.textContent = 'Start New Interview';
+    newInterviewButton.id = 'startNewInterviewButton';
+    newInterviewButton.onclick = resetInterview;
+    chatbox.appendChild(newInterviewButton);
+  }
+
+  // Function to reset the interview
+  function resetInterview() {
+    interviewResponses.length = 0; // Clear the temporary response array
+    currentStep = 0; // Reset to the first question
+
+    // Remove the "Start New Interview" button
+    const newInterviewButton = document.getElementById('startNewInterviewButton');
+    if (newInterviewButton) {
+      newInterviewButton.remove();
+    }
+
+    // Clear the chatbox
+    const chatbox = document.getElementById('chatbox');
+    chatbox.innerHTML = '';
+
+    // Restart the interview flow
+    sendNextQuestion();
+  }
+
+  // Example usage (replace with actual logic to collect questions and answers)
+  document.getElementById('addResponseButton').addEventListener('click', () => {
+    const question = document.getElementById('questionInput').value;
+    const answer = document.getElementById('answerInput').value;
+    addResponse(question, answer);
+  });
+
+  document.getElementById('completeInterviewButton').addEventListener('click', completeInterview);
+});
