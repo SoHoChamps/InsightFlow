@@ -231,22 +231,35 @@ app.post('/save', (req, res) => {
 
 // Save interview responses and analyze them
 app.post('/save-response', (req, res) => {
-  const { question, response } = req.body;
-  if (!question || !response) return res.status(400).send('Question and response are required');
+  const { id, timestamp, responses } = req.body;
+  if (!id || !timestamp || !responses || !Array.isArray(responses)) {
+    return res.status(400).send('Invalid request body');
+  }
 
-  const newEntry = {
-    id: Date.now(),
-    question,
-    response,
-    analysis: null,
-    timestamp: new Date().toISOString()
-  };
+  const newEntry = { id, timestamp, responses };
 
-  const data = JSON.parse(fs.readFileSync(filePath));
-  data.push(newEntry);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send('Error reading data');
+    }
 
-  res.status(200).json(newEntry);
+    let allData = [];
+    try {
+      allData = JSON.parse(data);
+    } catch (parseError) {
+      return res.status(500).send('Error parsing data');
+    }
+
+    allData.push(newEntry);
+
+    fs.writeFile(filePath, JSON.stringify(allData, null, 2), (writeErr) => {
+      if (writeErr) {
+        return res.status(500).send('Error saving data');
+      }
+
+      res.status(200).json({ message: 'Response saved successfully', entry: newEntry });
+    });
+  });
 });
 
 // Analyze responses using OpenAI
