@@ -14,6 +14,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('Public'));
 
+// Middleware to log incoming requests for debugging
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  if (req.method === 'POST') {
+    console.log('Request body:', req.body);
+  }
+  next();
+});
+
 // Initialize OpenAI (optional if only classifying)
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY // Securely load API key from .env file

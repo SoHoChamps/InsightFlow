@@ -101,7 +101,7 @@ function sendNextQuestion() {
       input.style.display = 'none';
       sendBtn.style.display = 'none';
       console.log("Final responses:", userResponses);
-      saveAndAnalyzeResponse(userResponses);
+      saveAllResponses(); // Automatically save all responses
     }
   }, 1500);
 }
@@ -167,6 +167,24 @@ async function saveResponse(question, response) {
   } catch (error) {
     console.error('Error saving response:', error);
   }
+}
+
+// Automatically submit all responses when the final question is answered
+function saveAllResponses() {
+  fetch('/save-response', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userResponses)
+  })
+    .then(res => res.json())
+    .then(data => {
+      console.log('All responses saved:', data);
+      alert('All responses have been saved successfully!');
+    })
+    .catch(err => {
+      console.error('Error saving responses:', err);
+      alert('Failed to save responses. Please try again.');
+    });
 }
 
 // Function to load saved responses and populate the dashboard
