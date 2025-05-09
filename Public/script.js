@@ -1,5 +1,6 @@
 let currentStep = 0;
 const userResponses = {};
+const interviewResponses = [];
 
 const interviewScript = [
   { type: 'text', key: 'fullName', question: "What is your first and last name?" },
@@ -23,7 +24,6 @@ function showBotMessage(msg, isTyping = false) {
   const chatbox = document.getElementById('chatbox');
   const botBubble = document.createElement('div');
   botBubble.className = 'bot-msg';
-
   botBubble.innerHTML = `
     <div class="bot-avatar">
       <img src="Pictures/Bot.jpg" alt="Bot Avatar" />
@@ -31,15 +31,19 @@ function showBotMessage(msg, isTyping = false) {
     <div class="bot-text">
       <strong>InsightFlow:</strong>
       ${isTyping ? '<span class="typing"><span class="dot-1">.</span><span class="dot-2">.</span><span class="dot-3">.</span></span>' : msg}
-    </div>
-  `;
-
+    </div>`;
   chatbox.appendChild(botBubble);
   chatbox.scrollTop = chatbox.scrollHeight;
   return botBubble;
 }
 
-function sendNextQuestion() {
+function updateProgressIndicator(currentStep, totalSteps) {
+  const progressElement = document.getElementById('progress');
+  progressElement.textContent = `Question ${currentStep + 1} of ${totalSteps}`;
+}
+
+function handleTextQuestion(step) {
+  updateProgressIndicator(currentStep, interviewScript.length);
   const chatbox = document.getElementById('chatbox');
   const input = document.getElementById('userInput');
   const sendBtn = document.getElementById('sendButton');
@@ -49,232 +53,131 @@ function sendNextQuestion() {
   sendBtn.style.display = 'block';
   input.value = '';
 
+  showBotMessage(step.question);
+}
+
+function handleSelectQuestion(step) {
+  updateProgressIndicator(currentStep, interviewScript.length);
+  const chatbox = document.getElementById('chatbox');
+  const input = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendButton');
+
+  showBotMessage(step.question);
+  const container = document.createElement('div');
+  container.id = 'optionButtons';
+
+  step.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.onclick = () => {
+      userResponses[step.key] = opt;
+      interviewResponses.push({ question: step.question, answer: opt });
+      chatbox.innerHTML += `<div class="user-msg"><strong>You:</strong> ${opt}</div>`;
+      showBotMessage("Thank you.");
+      container.remove();
+      currentStep += 1;
+      sendNextQuestion();
+    };
+    container.appendChild(btn);
+  });
+
+  chatbox.appendChild(container);
+  input.style.display = 'none';
+  sendBtn.style.display = 'none';
+}
+
+function handleInfoOrAck(step) {
+  updateProgressIndicator(currentStep, interviewScript.length);
+  showBotMessage(step.message);
+  currentStep += 1;
+  setTimeout(sendNextQuestion, 1000);
+}
+
+// Update sendNextQuestion to use these modular functions
+function sendNextQuestion() {
   const step = interviewScript[currentStep];
   if (!step) return;
 
-  const totalSteps = interviewScript.filter(s => !['ack', 'info', 'end'].includes(s.type)).length;
-  const currentProgress = interviewScript.slice(0, currentStep).filter(s => !['ack', 'info'].includes(s.type)).length + 1;
-  progress.innerText = `Step ${currentProgress} of ${totalSteps}`;
-
   const typingBubble = showBotMessage('', true);
-
   setTimeout(() => {
     typingBubble.remove();
 
     if (step.type === 'text') {
-      showBotMessage(step.question);
-    }
-
-    if (step.type === 'select') {
-      showBotMessage(step.question);
-      const container = document.createElement('div');
-      container.id = 'optionButtons';
-
-      step.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.onclick = () => {
-          userResponses[step.key] = opt;
-          chatbox.innerHTML += `<div class="user-msg"><strong>You:</strong> ${opt}</div>`;
-          showBotMessage("Thank you.");
-          container.remove();
-          currentStep += 2;
-          sendNextQuestion();
-        };
-        container.appendChild(btn);
-      });
-
-      chatbox.appendChild(container);
-      input.style.display = 'none';
-      sendBtn.style.display = 'none';
-      return;
-    }
-
-    if (step.type === 'ack' || step.type === 'info') {
+      handleTextQuestion(step);
+    } else if (step.type === 'select') {
+      handleSelectQuestion(step);
+    } else if (['info', 'ack'].includes(step.type)) {
+      handleInfoOrAck(step);
+    } else if (step.type === 'end') {
       showBotMessage(step.message);
-      currentStep++;
-      setTimeout(sendNextQuestion, 800);
+      document.getElementById('userInput').style.display = 'none';
+      document.getElementById('sendButton').style.display = 'none';
+      saveAllResponses();
     }
-
-    if (step.type === 'end') {
-      showBotMessage(step.message);
-      input.style.display = 'none';
-      sendBtn.style.display = 'none';
-      console.log("Final responses:", userResponses);
-      saveAllResponses(); // Automatically save all responses
-    }
-  }, 1500);
+  }, 1200);
 }
 
-// Save progress to localStorage whenever a response is entered
-function saveProgressToLocalStorage() {
-  localStorage.setItem('userResponses', JSON.stringify(userResponses));
-}
-
-// Load progress from localStorage when the page loads
-function loadProgressFromLocalStorage() {
-  const savedResponses = localStorage.getItem('userResponses');
-  if (savedResponses) {
-    Object.assign(userResponses, JSON.parse(savedResponses));
-  }
-}
-
-// Update sendMessage function to send responses to /save-response
 function sendMessage() {
   const input = document.getElementById('userInput');
   const message = input.value.trim();
   if (!message) return;
 
+  const step = interviewScript[currentStep];
+  if (!step || step.type !== 'text') return;
+
   const chatbox = document.getElementById('chatbox');
   chatbox.innerHTML += `<div class="user-msg"><strong>You:</strong> ${message}</div>`;
   input.value = '';
 
-  const step = interviewScript[currentStep];
-  if (step?.type === 'text') {
-    const responseEntry = {
-      question: step.question,
-      response: message,
-      timestamp: new Date().toISOString(),
-      id: Date.now(),
-    };
-
-    // Send response to /save-response
-    fetch('/save-response', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(responseEntry),
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to save response');
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log('Response saved:', data);
-      })
-      .catch(err => {
-        console.error('Error saving response:', err);
-      });
-
-    userResponses[step.key] = message;
-    saveProgressToLocalStorage(); // Save progress after each response
-    currentStep++;
-    sendNextQuestion();
-  }
+  userResponses[step.key] = message;
+  interviewResponses.push({ question: step.question, answer: message });
+  currentStep++;
+  sendNextQuestion();
 }
 
-function saveResponse(responseData) {
-  fetch('/save', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(responseData)
-  })
-  .then(res => res.json())
-  .then(data => console.log('Saved:', data))
-  .catch(err => console.error('Save failed:', err));
-}
-
-function saveAndAnalyzeResponse(responseData) {
-  fetch('/save-and-analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ input: responseData })
-  })
-  .then(res => res.json())
-  .then(data => console.log('Saved and analyzed:', data))
-  .catch(err => console.error('Save and analyze failed:', err));
-}
-
-function saveUserInput(input) {
-  fetch('/save-input', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ input })
-  })
-  .then(res => res.json())
-  .then(data => console.log('Input saved with ID:', data.id))
-  .catch(err => console.error('Failed to save input:', err));
-}
-
-// Function to save user responses to the backend
-async function saveResponse(question, response) {
-  try {
-    await fetch('/save-response', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, response })
-    });
-  } catch (error) {
-    console.error('Error saving response:', error);
-  }
-}
-
-// Automatically submit all responses when the final question is answered
 function saveAllResponses() {
+  const payload = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    responses: interviewResponses
+  };
+
+  console.log('Sending full payload to server:', payload); // ✅ ADD THIS LINE
+  
   fetch('/save-response', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userResponses)
+    body: JSON.stringify(payload)
   })
     .then(res => res.json())
     .then(data => {
-      console.log('All responses saved:', data);
-      alert('All responses have been saved successfully!');
+      console.log('Saved full interview:', data);
+      showStartNewInterviewButton();
     })
     .catch(err => {
-      console.error('Error saving responses:', err);
-      alert('Failed to save responses. Please try again.');
+      console.error('Failed to save interview:', err);
+      alert('Saving failed.');
     });
 }
 
-// Function to load saved responses and populate the dashboard
-async function loadResponses() {
-  try {
-    const response = await fetch('/responses');
-    const data = await response.json();
-
-    // Populate the dashboard with saved data
-    const tableBody = document.querySelector('#response-table tbody');
-    tableBody.innerHTML = '';
-
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.question}</td>
-        <td>${row.response}</td>
-        <td>${row.analysis || 'Pending Analysis'}</td>
-      `;
-      tableBody.appendChild(tr);
-    });
-  } catch (error) {
-    console.error('Error loading responses:', error);
-  }
+function showStartNewInterviewButton() {
+  const chatbox = document.getElementById('chatbox');
+  const button = document.createElement('button');
+  button.textContent = 'Start New Interview';
+  button.id = 'startNewInterviewButton';
+  button.onclick = resetInterview;
+  chatbox.appendChild(button);
 }
 
-// Call loadResponses when the dashboard page loads
-if (window.location.pathname.includes('dashboard.html')) {
-  document.addEventListener('DOMContentLoaded', loadResponses);
+function resetInterview() {
+  currentStep = 0;
+  Object.keys(userResponses).forEach(k => delete userResponses[k]);
+  interviewResponses.length = 0;
+  document.getElementById('chatbox').innerHTML = '';
+  sendNextQuestion();
 }
 
-// Save responses when the user submits them in the interview page
-if (window.location.pathname.includes('interview.html')) {
-  document.querySelectorAll('.question-form').forEach(form => {
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const question = form.querySelector('.question').textContent;
-      const response = form.querySelector('.response').value;
-      await saveResponse(question, response);
-      alert('Response saved!');
-    });
-  });
-}
-
-// Load progress when the page loads
-if (window.location.pathname.includes('interview.html')) {
-  document.addEventListener('DOMContentLoaded', loadProgressFromLocalStorage);
-}
-
+// Onboarding modal + flow start
 window.onload = function () {
   const modal = document.getElementById('onboardingModal');
   if (modal) {
@@ -285,9 +188,9 @@ window.onload = function () {
     const checkbox = document.getElementById('consentCheckbox');
 
     const steps = [
-      `Hi there! Thank you for participating in this InsightFlow interview.<br><br>It will take around <strong>5 minutes</strong>. Before we begin, here's a quick overview of how it works.<br><br>Click <strong>Next</strong> to continue.`,
-      `You'll be asked a few questions about your <strong>background</strong> and then your <strong>thoughts on a product</strong>.<br><br>Please keep your answers short and clear, one or two sentences is perfect.<br><br>Click <strong>Next</strong> to continue.`,
-      `Before we begin, please confirm that you have read and agree to our <strong>Terms and Conditions</strong> and <strong>Privacy Policy</strong>.<br><br><strong>Check the box below and then click <strong>Begin</strong>.</strong>`
+      "Hi there! Thank you for participating in this InsightFlow interview.<br><br>It will take around <strong>5 minutes</strong>. Click <strong>Next</strong> to continue.",
+      "You'll be asked questions about your background and thoughts on a product.<br><br>Click <strong>Next</strong> to continue.",
+      "Before we begin, please agree to the <strong>Terms and Privacy Policy</strong>."
     ];
 
     text.innerHTML = steps[step];
@@ -324,81 +227,3 @@ window.onload = function () {
   document.getElementById('sendButton').addEventListener('click', sendMessage);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const interviewResponses = [];
-
-  // Function to add a question-response pair to the array
-  function addResponse(question, answer) {
-    interviewResponses.push({ question, answer });
-  }
-
-  // Function to send all responses to the server
-  function completeInterview() {
-    const payload = {
-      id: Date.now(),
-      timestamp: new Date().toISOString(),
-      responses: interviewResponses,
-    };
-
-    fetch('/save-response', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to save responses');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Interview responses saved:', data);
-        // Clear the array after successful save
-        interviewResponses.length = 0;
-        showStartNewInterviewButton();
-      })
-      .catch(error => {
-        console.error('Error saving responses:', error);
-      });
-  }
-
-  // Function to show the "Start New Interview" button
-  function showStartNewInterviewButton() {
-    const chatbox = document.getElementById('chatbox');
-    const newInterviewButton = document.createElement('button');
-    newInterviewButton.textContent = 'Start New Interview';
-    newInterviewButton.id = 'startNewInterviewButton';
-    newInterviewButton.onclick = resetInterview;
-    chatbox.appendChild(newInterviewButton);
-  }
-
-  // Function to reset the interview
-  function resetInterview() {
-    interviewResponses.length = 0; // Clear the temporary response array
-    currentStep = 0; // Reset to the first question
-
-    // Remove the "Start New Interview" button
-    const newInterviewButton = document.getElementById('startNewInterviewButton');
-    if (newInterviewButton) {
-      newInterviewButton.remove();
-    }
-
-    // Clear the chatbox
-    const chatbox = document.getElementById('chatbox');
-    chatbox.innerHTML = '';
-
-    // Restart the interview flow
-    sendNextQuestion();
-  }
-
-  // Example usage (replace with actual logic to collect questions and answers)
-  document.getElementById('addResponseButton').addEventListener('click', () => {
-    const question = document.getElementById('questionInput').value;
-    const answer = document.getElementById('answerInput').value;
-    addResponse(question, answer);
-  });
-
-  document.getElementById('completeInterviewButton').addEventListener('click', completeInterview);
-});
