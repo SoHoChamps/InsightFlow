@@ -111,11 +111,10 @@ body {
   }
   
   .dashboard-title {
-    font-size: 1.75rem;
-    font-weight: 700;
     text-align: center;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
   }
   
   .dashboard-title .blue {
@@ -213,15 +212,18 @@ body {
   }  
   
   .export-btn {
-    width: auto;
-    padding: 10px 20px;
-    font-size: 16px;
-    text-align: center;
-    background-color: #0074E0;
+    background-color: #ff9800; /* Orange background */
     color: white;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .export-btn:hover {
+    background-color: #e68900; /* Darker orange on hover */
   }
 
   .export-btn,
@@ -245,17 +247,6 @@ body {
     background-color: #005bb5; /* Darker blue on hover */
   }
 
-  .export-btn {
-    background-color: #0074E0;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
   .apply-filters-btn {
     background-color: #28a745;
     color: white;
@@ -264,10 +255,6 @@ body {
   .reset-btn {
     background-color: #dc3545;
     color: white;
-  }
-
-  .export-btn:hover {
-    background-color: #005bb5;
   }
 
   .apply-filters-btn:hover {

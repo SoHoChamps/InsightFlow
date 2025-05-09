@@ -142,110 +142,151 @@
 
       <!-- Consolidated Page Content: Sections for Home, Create, Browse, and Data pages -->
       <div id="home-section" class="page-section">
-        <h2>Welcome to InsightFlow</h2>
-        <p>Your intelligent platform for analyzing user interview data.</p>
-        <section>
-          <h3>Our Mission</h3>
-          <p>To turn qualitative insights into actionable decisions through smart analytics and user-friendly tools.</p>
-        </section>
-        <section>
-          <h3>What We Do</h3>
-          <ul>
-            <li>📊 Collect and visualize sentiment data</li>
-            <li>🎯 Understand user motivations and emotions</li>
-            <li>📈 Help you make data-driven decisions faster</li>
-          </ul>
-        </section>
-      </div>
+    <h1>Welcome to InsightFlow</h1>
+    <p>Your intelligent platform for analyzing user interview data.</p>
+    <section>
+      <h2>Our Mission</h2>
+      <p>To turn qualitative insights into actionable decisions through smart analytics and user-friendly tools.</p>
+    </section>
+    <section>
+      <h2>Why Choose Us?</h2>
+      <p>InsightFlow is trusted by thousands of professionals worldwide to streamline their research and make data-driven decisions.</p>
+      <ul>
+        <li>📊 Advanced analytics tools</li>
+        <li>🎯 AI-powered insights</li>
+        <li>📈 Customizable dashboards</li>
+        <li>🔍 Comprehensive data visualization</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Get Started Today</h2>
+      <p>Sign up now and transform the way you analyze user feedback.</p>
+      <button class="cta-button">Sign Up Now</button>
+    </section>
+  </div>
 
       <div id="create-section" class="page-section" style="display: none;">
-        <h2>Create</h2>
-        <p>Welcome to the Create page. Add your content here.</p>
-      </div>
+    <h1>Create a New Interview</h1>
+    <p>Set up a chatbot interview with your consumers in just a few clicks.</p>
+    <button class="big-plus-button">➕</button>
+    <section>
+      <h2>Filters</h2>
+      <label for="date">Date:</label>
+      <input type="date" id="date" />
 
-      <div id="browse-section" class="page-section" style="display: none;">
-        <h2>InsightFlow Files</h2>
-        <div class="file-grid">
-          <div class="file-card">📄 Interview_01.json</div>
-          <div class="file-card">📄 Summary_Report.docx</div>
-          <div class="file-card">📊 Q1_Sentiment.csv</div>
-          <div class="file-card">📁 User_Data_Backup/</div>
-          <div class="file-card">📄 Feedback_2025.txt</div>
-          <div class="file-card">📄 Chart_Data_March.csv</div>
-        </div>
-      </div>
+      <label for="time">Time:</label>
+      <input type="time" id="time" />
 
-      <div id="data-section" class="page-section" style="display: none;">
-        <h2>Raw Data Table</h2>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Country</th>
-              <th>Gender</th>
-              <th>Date of Birth</th>
-              <th>Satisfaction</th>
-              <th>Usage</th>
-              <th>Likes</th>
-              <th>Dislikes</th>
-              <th>Improvements</th>
-              <th>Discovery</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-          S <cot>John Doe</td>
-              <td>USA</td>
-              <td>Male</td>
-              <td>1990-01-15</td>
-              <td>4</td>
-              <td>Personal Projects</td>
-              <td>Ease of Use</td>
-              <td>Limited Features</td>
-              <td>More Integrations</td>
-              <td>Online Ad</td>
-            </tr>
-            <tr>
-              <td>Jane Smith</td>
-              <td>Canada</td>
-              <td>Female</td>
-              <td>1985-07-22</td>
-              <td>5</td>
-              <td>Work</td>
-              <td>Performance</td>
-              <td>High Cost</td>
-              <td>Better Pricing</td>
-              <td>Friend</td>
-            </tr>
-            <!-- Add 48 more rows of fake data -->
-            <tr>
-              <td>Michael Brown</td>
-              <td>UK</td>
-              <td>Male</td>
-              <td>1992-03-10</td>
-              <td>3</td>
-              <td>Education</td>
-              <td>Design</td>
-              <td>Complex Setup</td>
-              <td>Simplify Setup</td>
-              <td>Social Media</td>
-            </tr>
-            <tr>
-              <td>Emily Davis</td>
-              <td>Australia</td>
-              <td>Female</td>
-              <td>1995-11-05</td>
-              <td>4</td>
-              <td>Hobby</td>
-              <td>Support</td>
-              <td>Slow Updates</td>
-              <td>Faster Updates</td>
-              <td>Search Engine</td>
-            </tr>
-            <!-- ...additional rows... -->
-          </tbody>
-        </table>
-      </div>
+      <label for="contact">Contact:</label>
+      <input type="text" id="contact" placeholder="Enter contact name or email" />
+
+      <label for="category">Category:</label>
+      <select id="category">
+        <option value="product">Product</option>
+        <option value="service">Service</option>
+        <option value="feedback">Feedback</option>
+      </select>
+
+      <label for="questions">Questions:</label>
+      <textarea id="questions" placeholder="Enter your questions here..."></textarea>
+    </section>
+  </div>
+
+      <!-- Updated Browse Section -->
+  <div id="browse-section" class="page-section" style="display: none;">
+    <h1>Browse Files</h1>
+    <p>Access all your uploaded files and reports in one place.</p>
+    <div class="file-grid">
+      <!-- Fill the page with folders -->
+      <div class="file-card">📁 Project_A</div>
+      <div class="file-card">📁 Project_B</div>
+      <div class="file-card">📁 Project_C</div>
+      <div class="file-card">📁 Reports_2025</div>
+      <div class="file-card">📁 Feedback_2024</div>
+      <div class="file-card">📁 User_Data</div>
+      <div class="file-card">📁 Archive</div>
+      <div class="file-card">📁 Sentiment_Analysis</div>
+      <div class="file-card">📁 Charts</div>
+      <div class="file-card">📁 Backup</div>
+      <div class="file-card">📁 Interviews</div>
+      <div class="file-card">📁 Miscellaneous</div>
+    </div>
+  </div>
+
+      <!-- Updated Data Section -->
+  <div id="data-section" class="page-section" style="display: none;">
+    <h1>Data Overview</h1>
+    <p>Explore detailed data tables and insights from your interviews.</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Country</th>
+          <th>Gender</th>
+          <th>Date of Birth</th>
+          <th>Satisfaction</th>
+          <th>Usage</th>
+          <th>Likes</th>
+          <th>Dislikes</th>
+          <th>Improvements</th>
+          <th>Discovery</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Fill the table with data to cover the full page -->
+        <tr>
+          <td>John Doe</td>
+          <td>USA</td>
+          <td>Male</td>
+          <td>1990-01-15</td>
+          <td>4</td>
+          <td>Personal Projects</td>
+          <td>Ease of Use</td>
+          <td>Limited Features</td>
+          <td>More Integrations</td>
+          <td>Online Ad</td>
+        </tr>
+        <tr>
+          <td>Jane Smith</td>
+          <td>Canada</td>
+          <td>Female</td>
+          <td>1985-07-22</td>
+          <td>5</td>
+          <td>Work</td>
+          <td>Performance</td>
+          <td>High Cost</td>
+          <td>Better Pricing</td>
+          <td>Friend</td>
+        </tr>
+        <!-- Add more rows to fill the page -->
+        <tr>
+          <td>Michael Brown</td>
+          <td>UK</td>
+          <td>Male</td>
+          <td>1992-03-10</td>
+          <td>3</td>
+          <td>Education</td>
+          <td>Design</td>
+          <td>Complex Setup</td>
+          <td>Simplify Setup</td>
+          <td>Social Media</td>
+        </tr>
+        <tr>
+          <td>Emily Davis</td>
+          <td>Australia</td>
+          <td>Female</td>
+          <td>1995-11-05</td>
+          <td>4</td>
+          <td>Hobby</td>
+          <td>Support</td>
+          <td>Slow Updates</td>
+          <td>Faster Updates</td>
+          <td>Search Engine</td>
+        </tr>
+        <!-- Add more rows as needed -->
+      </tbody>
+    </table>
+  </div>
 
       <!-- Dashboard Section: Consolidated Page Content -->
       <div id="dashboard-section" class="page-section" style="display: none;">
