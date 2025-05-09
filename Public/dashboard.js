@@ -247,6 +247,22 @@ function generateChart(data) {
 // Call fetchResponses when the page loads
 fetchResponses();
 
+// Function to periodically refresh the dashboard data
+function autoRefreshDashboard() {
+  setInterval(async () => {
+    await loadResponses(); // Re-fetch and update the dashboard data
+    console.log('Dashboard data refreshed');
+  }, 30000); // Refresh every 30 seconds
+}
+
+// Call autoRefreshDashboard when the dashboard page loads
+if (window.location.pathname.includes('dashboard.html')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    loadResponses(); // Initial load
+    autoRefreshDashboard(); // Start auto-refresh
+  });
+}
+
 window.onload = function() {
   loadData();
   loadAnalyzedData();
