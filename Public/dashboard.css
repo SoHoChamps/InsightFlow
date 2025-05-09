@@ -163,6 +163,21 @@ body {
     color: #888;
   }
   
+  #wordCloud,
+  #feedbackSummary {
+    min-height: 150px;
+    background-color: #f1f9ff;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  .page-section {
+    padding: 2rem;
+    display: none;
+  }
+
   @media (max-width: 768px) {
     .dashboard-container {
       flex-direction: column;
@@ -272,6 +287,11 @@ body {
     justify-content: space-between;
     gap: 1rem;
     margin-top: 1rem;
+  }
+
+  .dashboard-kpis table {
+    margin-top: 1rem;
+    overflow-x: auto;
   }
 
   .dashboard-kpis .kpi-card {
@@ -436,4 +456,38 @@ body {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 6px;
+  }
+
+  .button-base {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .button-blue {
+    background-color: #0074E0;
+  }
+  
+  .button-blue:hover {
+    background-color: #005bb5;
+  }
+  
+  .button-green {
+    background-color: #28a745;
+  }
+  
+  .button-green:hover {
+    background-color: #218838;
+  }
+  
+  .button-red {
+    background-color: #dc3545;
+  }
+  
+  .button-red:hover {
+    background-color: #c82333;
   }
