@@ -291,6 +291,7 @@
       <!-- Table for displaying interview responses -->
   <div id="response-table-section" class="page-section" style="display: none;">
     <h1>Interview Responses</h1>
+    <button id="analyzeResponsesButton">Analyze All Responses</button>
     <table id="response-table" class="data-table">
       <thead>
         <tr>
@@ -455,6 +456,35 @@
       document.getElementById('btn-data').addEventListener('click', () => showSection('data'));
       // Add event listener for the dashboard button to show the dashboard section
       document.getElementById('btn-dashboard').addEventListener('click', () => showSection('dashboard'));
+    </script>
+    <script>
+      document.getElementById('analyzeResponsesButton').addEventListener('click', async () => {
+        try {
+          const response = await fetch('/responses');
+          const entries = await response.json();
+
+          for (const entry of entries) {
+            const res = await fetch('/analyze-response', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: entry.id })
+            });
+
+            if (!res.ok) {
+              console.error(`Failed to analyze response with ID ${entry.id}`);
+              continue;
+            }
+
+            const updatedEntry = await res.json();
+            console.log(`Response analyzed and updated:`, updatedEntry);
+          }
+
+          alert('All responses have been analyzed and updated!');
+        } catch (error) {
+          console.error('Error analyzing responses:', error);
+          alert('Failed to analyze responses. Please try again.');
+        }
+      });
     </script>
   </div>
 
