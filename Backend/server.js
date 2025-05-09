@@ -1,14 +1,16 @@
-require('dotenv').config();
-
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const OpenAI = require("openai");
 const fs = require('fs');
-const { Configuration, OpenAIApi } = require('openai');
 const sqlite3 = require('sqlite3').verbose();
+const path = require("path");
+
+dotenv.config(); // Load .env variables
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -23,14 +25,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize OpenAI (optional if only classifying)
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY // Securely load API key from .env file
+// ✅ Initialize OpenAI client with v4 syntax
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 // Initialize SQLite database
-const db = new sqlite3.Database('./data/database.db');
+const db = new sqlite3.Database('./Backend/data/database.db');
 
 // Create tables for user inputs and analyzed data
 const createTables = () => {
@@ -135,10 +136,16 @@ app.get('/analyzed-data', (req, res) => {
   });
 });
 
-// Ensure data file exists
-const DATA_FILE = './Backend/data/interviews.json';
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify([]));
+// Ensure data directory and file exist
+const dataDir = path.join(__dirname, "data");
+const filePath = path.join(dataDir, "interviews.json");
+
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir);
+}
+
+if (!fs.existsSync(filePath)) {
+  fs.writeFileSync(filePath, "[]"); // empty JSON array
 }
 
 // Store user Q&A pairs (no OpenAI call here)
@@ -155,16 +162,16 @@ app.post('/chat', (req, res) => {
     answer
   };
 
-  const existing = JSON.parse(fs.readFileSync(DATA_FILE));
+  const existing = JSON.parse(fs.readFileSync(filePath));
   existing.push(newEntry);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(existing, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(existing, null, 2));
 
   res.json({ status: 'saved', entry: newEntry });
 });
 
 // Get all saved entries for dashboard
 app.get('/interviews', (req, res) => {
-  fs.readFile('./data/interviews.json', 'utf8', (err, data) => {
+  fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading data');
     res.json(JSON.parse(data));
   });
@@ -188,7 +195,7 @@ app.post('/classify', async (req, res) => {
 // Save interview responses
 app.post('/save-interview', (req, res) => {
   const newEntry = req.body;
-  const filePath = './data/interviews.json';
+  const filePath = './Backend/data/interviews.json';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     const allData = data ? JSON.parse(data) : [];
@@ -207,7 +214,7 @@ app.post('/save-interview', (req, res) => {
 // Save responses
 app.post('/save', (req, res) => {
   const newEntry = req.body;
-  const filePath = './data/interviews.json';
+  const filePath = './Backend/data/interviews.json';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     const allData = data ? JSON.parse(data) : [];
@@ -236,9 +243,9 @@ app.post('/save-response', (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  const data = JSON.parse(fs.readFileSync(filePath));
   data.push(newEntry);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
   res.status(200).json(newEntry);
 });
@@ -248,7 +255,7 @@ app.post('/analyze-response', async (req, res) => {
   const { id } = req.body;
   if (!id) return res.status(400).send('ID is required');
 
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  const data = JSON.parse(fs.readFileSync(filePath));
   const entry = data.find(item => item.id === id);
   if (!entry) return res.status(404).send('Entry not found');
 
@@ -260,7 +267,7 @@ app.post('/analyze-response', async (req, res) => {
     });
 
     entry.analysis = result.choices[0].message.content;
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
     res.status(200).json(entry);
   } catch (error) {
@@ -270,11 +277,32 @@ app.post('/analyze-response', async (req, res) => {
 
 // Fetch all responses
 app.get('/responses', (req, res) => {
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  const data = JSON.parse(fs.readFileSync(filePath));
   res.status(200).json(data);
+});
+
+// ✅ Route example
+app.post("/api/analyze", async (req, res) => {
+  const userText = req.body.text;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "You are a helpful assistant that analyzes user feedback." },
+        { role: "user", content: `Analyze this customer feedback: \"${userText}\"` },
+      ],
+    });
+
+    const analysis = response.choices[0].message.content;
+    res.json({ analysis });
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    res.status(500).json({ error: "Something went wrong with the analysis." });
+  }
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
