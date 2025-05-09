@@ -212,7 +212,7 @@ body {
   }  
   
   .export-btn {
-    background-color: #ff9800; /* Orange background */
+    background-color: #0074E0; /* Blue background */
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -223,7 +223,7 @@ body {
   }
 
   .export-btn:hover {
-    background-color: #e68900; /* Darker orange on hover */
+    background-color: #005bb5; /* Darker blue on hover */
   }
 
   .export-btn,

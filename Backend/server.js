@@ -36,6 +36,14 @@ const createTables = () => {
     analysis TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS interview_responses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question TEXT NOT NULL,
+    response TEXT NOT NULL,
+    analysis TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 };
 
 createTables();
@@ -119,7 +127,7 @@ app.get('/analyzed-data', (req, res) => {
 });
 
 // Ensure data file exists
-const DATA_FILE = './data/interviews.json';
+const DATA_FILE = './Backend/data/interviews.json';
 if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
@@ -204,6 +212,57 @@ app.post('/save', (req, res) => {
       }
     });
   });
+});
+
+// Save interview responses and analyze them
+app.post('/save-response', (req, res) => {
+  const { question, response } = req.body;
+  if (!question || !response) return res.status(400).send('Question and response are required');
+
+  const newEntry = {
+    id: Date.now(),
+    question,
+    response,
+    analysis: null,
+    timestamp: new Date().toISOString()
+  };
+
+  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  data.push(newEntry);
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+
+  res.status(200).json(newEntry);
+});
+
+// Analyze responses using OpenAI
+app.post('/analyze-response', async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).send('ID is required');
+
+  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  const entry = data.find(item => item.id === id);
+  if (!entry) return res.status(404).send('Entry not found');
+
+  try {
+    const prompt = `Analyze the following response:\nQuestion: ${entry.question}\nResponse: ${entry.response}`;
+    const result = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    entry.analysis = result.choices[0].message.content;
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+
+    res.status(200).json(entry);
+  } catch (error) {
+    res.status(500).send('Failed to analyze response');
+  }
+});
+
+// Fetch all responses
+app.get('/responses', (req, res) => {
+  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  res.status(200).json(data);
 });
 
 // Start server

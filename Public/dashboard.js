@@ -190,6 +190,63 @@ async function updateDashboardWithAnalyzedData() {
   });
 }
 
+// Fetch and display interview responses
+async function fetchResponses() {
+  try {
+    const response = await fetch('/responses');
+    const data = await response.json();
+
+    const tableBody = document.querySelector('#response-table tbody');
+    tableBody.innerHTML = '';
+
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.question}</td>
+        <td>${row.response}</td>
+        <td>${row.analysis}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    generateChart(data);
+  } catch (error) {
+    console.error('Error fetching responses:', error);
+  }
+}
+
+// Generate a chart based on the responses
+function generateChart(data) {
+  const ctx = document.getElementById('response-chart').getContext('2d');
+  const labels = data.map(row => row.question);
+  const values = data.map(row => row.analysis.length); // Example: Use analysis length as a value
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Analysis Length',
+        data: values,
+        backgroundColor: 'rgba(0, 116, 224, 0.5)',
+        borderColor: 'rgba(0, 116, 224, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// Call fetchResponses when the page loads
+fetchResponses();
+
 window.onload = function() {
   loadData();
   loadAnalyzedData();
