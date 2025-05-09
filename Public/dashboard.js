@@ -1,7 +1,7 @@
 let originalData = [];
 
 async function loadData() {
-  const res = await fetch('/interview.json');
+  const res = await fetch('/interviews');
   const data = await res.json();
   originalData = data;
   populateFilters(data);
@@ -9,261 +9,149 @@ async function loadData() {
 }
 
 function populateFilters(data) {
-  const countries = [...new Set(data.map(d => d.country))];
-  const countryFilter = document.getElementById('countryFilter');
+  const countrySelect = document.getElementById('countrySelect');
+  const genderSelect = document.getElementById('genderSelect');
+
+  const countries = [...new Set(data.map(d => d.responses.find(r => r.question.toLowerCase().includes("country"))?.answer))].filter(Boolean);
   countries.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c;
     opt.textContent = c;
-    countryFilter.appendChild(opt);
+    countrySelect.appendChild(opt);
   });
 }
 
 function applyFilters() {
-  const country = document.getElementById('countryFilter').value;
-  const gender = document.getElementById('genderFilter').value;
-  const date = document.getElementById('dateFilter').value;
+  const country = document.getElementById('countrySelect').value;
+  const gender = document.getElementById('genderSelect').value;
+  const date = document.getElementById('dateInput').value;
 
   const filtered = originalData.filter(d => {
-    return (!country || d.country === country) &&
-           (!gender || d.gender === gender) &&
-           (!date || new Date(d.timestamp) >= new Date(date));
+    const responseMap = Object.fromEntries(d.responses.map(r => [r.question.toLowerCase(), r.answer]));
+    const entryDate = new Date(d.timestamp).toISOString().split("T")[0];
+    return (country === "All" || responseMap["what country are you from?"] === country) &&
+           (gender === "All" || responseMap["what is your gender?"] === gender) &&
+           (!date || entryDate === date);
   });
 
   updateDashboard(filtered);
 }
 
 function exportCSV() {
-  let csv = 'Name,Country,Gender,DOB,Satisfaction,Timestamp\n';
+  const rows = [];
   originalData.forEach(d => {
-    csv += `${d.fullName},${d.country},${d.gender},${d.dob},${d.satisfaction},${d.timestamp}\n`;
+    const row = {};
+    d.responses.forEach(r => {
+      row[r.question] = r.answer;
+    });
+    row.timestamp = d.timestamp;
+    rows.push(row);
   });
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
+  const headers = Object.keys(rows[0] || {});
+  const csv = [headers.join(",")].concat(
+    rows.map(r => headers.map(h => `"${(r[h] || "").replace(/"/g, '""')}"`).join(","))
+  ).join("\n");
 
-  const a = document.createElement('a');
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'interview_data.csv';
+  a.download = "interview_data.csv";
   a.click();
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const response = await fetch('interview.json');
-  const data = await response.json();
-
-  // Helper: Count occurrences
-  const countByValue = (arr) => {
-    return arr.reduce((acc, val) => {
-      if (val) acc[val] = (acc[val] || 0) + 1;
-      return acc;
-    }, {});
-  };
-
-  // Extract responses
-  const ratings = data.map(d => parseFloat(d.satisfaction)).filter(n => !isNaN(n));
-  const usage = data.map(d => d.usage).filter(Boolean);
-
-  // === KPI Cards ===
-  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length || 0;
-  document.getElementById('avgRating').innerText = avg.toFixed(2);
-  document.getElementById('totalInterviews').innerText = data.length;
-
-  // Optional additional KPIs (if elements are added in HTML)
-  const topUse = Object.entries(countByValue(usage)).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
-  const topUseEl = document.getElementById('topUsage');
-  if (topUseEl) topUseEl.innerText = topUse;
-
-  // === Charts ===
-
-  // Sentiment placeholder (replace with real NLP later)
-  const sentimentCounts = { Positive: 10, Neutral: 5, Negative: 3 };
-  const sentimentCtx = document.getElementById('sentimentChart');
-  if (sentimentCtx) {
-    new Chart(sentimentCtx, {
-      type: 'pie',
-      data: {
-        labels: Object.keys(sentimentCounts),
-        datasets: [{
-          data: Object.values(sentimentCounts),
-          backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  }
-
-  // Usage chart (optional)
-  const usageCounts = countByValue(usage);
-  const usageLabels = Object.keys(usageCounts);
-  const usageValues = Object.values(usageCounts);
-  const usageCanvas = document.getElementById('usageChart');
-  if (usageCanvas) {
-    new Chart(usageCanvas, {
-      type: 'bar',
-      data: {
-        labels: usageLabels,
-        datasets: [{
-          label: 'Usage',
-          data: usageValues,
-          backgroundColor: '#0074E0'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
-});
-
-fetch('/interviews')
-  .then(res => res.json())
-  .then(data => {
-    updateKPIs(data);
-    renderCharts(data);
-  });
+function updateDashboard(data) {
+  updateKPIs(data);
+  renderCharts(data);
+}
 
 function updateKPIs(data) {
-  document.getElementById('totalInterviews').innerText = data.length;
-  const ratings = data.map(d => parseFloat(d.satisfaction)).filter(n => !isNaN(n));
-  const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  document.getElementById('avgRating').innerText = avg.toFixed(2);
+  document.getElementById('totalInterviews').textContent = data.length;
+
+  let total = 0;
+  let count = 0;
+  const usageMap = {};
+  const emotionMap = {};
+
+  data.forEach(entry => {
+    const map = Object.fromEntries(entry.responses.map(r => [r.question.toLowerCase(), r.answer]));
+    const satisfaction = parseFloat(map["how satisfied were you with the product from 1 to 5 (5 = very satisfied)?"]);
+    const usage = map["what did you use the product for?"];
+    const emotion = map["what did you like most about it?"];
+
+    if (!isNaN(satisfaction)) {
+      total += satisfaction;
+      count++;
+    }
+
+    if (usage) usageMap[usage] = (usageMap[usage] || 0) + 1;
+    if (emotion) emotionMap[emotion] = (emotionMap[emotion] || 0) + 1;
+  });
+
+  document.getElementById('avgRating').textContent = count ? (total / count).toFixed(2) : "--";
+  document.getElementById('topUsage').textContent = Object.entries(usageMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+  document.getElementById('topEmotion').textContent = Object.entries(emotionMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 }
 
 function renderCharts(data) {
-  const motivations = {};
+  const sentimentCount = {};
+  const motivationCount = {};
+  const contextCount = {};
+  const satisfactionCount = {};
 
-  data.forEach(d => {
-    if (d.reasonChosen) motivations[d.reasonChosen] = (motivations[d.reasonChosen] || 0) + 1;
+  data.forEach(entry => {
+    const map = Object.fromEntries(entry.responses.map(r => [r.question.toLowerCase(), r.answer]));
+
+    const sentiment = entry.analysis?.sentiment || "Unanalyzed";
+    sentimentCount[sentiment] = (sentimentCount[sentiment] || 0) + 1;
+
+    const motivation = map["how did you first hear about this product?"];
+    if (motivation) motivationCount[motivation] = (motivationCount[motivation] || 0) + 1;
+
+    const context = map["where were you when you used the product?"];
+    if (context) contextCount[context] = (contextCount[context] || 0) + 1;
+
+    const satisfaction = parseInt(map["how satisfied were you with the product from 1 to 5 (5 = very satisfied)?"]);
+    if (!isNaN(satisfaction)) satisfactionCount[satisfaction] = (satisfactionCount[satisfaction] || 0) + 1;
   });
 
-  new Chart(document.getElementById('motivationChart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(motivations),
-      datasets: [{ data: Object.values(motivations), label: "Motivations", backgroundColor: "#0074E0" }]
-    }
-  });
+  renderPieChart('sentimentChart', sentimentCount);
+  renderBarChart('motivationChart', motivationCount);
+  renderBarChart('contextChart', contextCount);
+  renderBarChart('satisfactionChart', satisfactionCount);
 }
 
-async function loadAnalyzedData() {
-  const res = await fetch('/analyzed-data');
-  const data = await res.json();
-
-  // Update KPI cards and charts with analyzed data
-  document.getElementById('totalInterviews').innerText = data.length;
-  const analysis = data.map(d => d.analysis).join('\n');
-  document.getElementById('avgRating').innerText = analysis; // Example update
-}
-
-async function updateDashboardWithAnalyzedData() {
-  const res = await fetch('/analyzed-data');
-  const data = await res.json();
-
-  // Update KPI cards with specific metrics
-  const ratings = data.filter(d => d.analysis.includes('satisfaction')).map(d => parseFloat(d.analysis));
-  const avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length || 0;
-  document.getElementById('avgRating').innerText = avgRating.toFixed(2);
-
-  const usage = data.filter(d => d.analysis.includes('usage'));
-  const usageCounts = usage.reduce((acc, d) => {
-    const use = d.analysis;
-    acc[use] = (acc[use] || 0) + 1;
-    return acc;
-  }, {});
-
-  new Chart(document.getElementById('usageChart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(usageCounts),
-      datasets: [{
-        label: 'Usage',
-        data: Object.values(usageCounts),
-        backgroundColor: '#0074E0'
-      }]
-    }
-  });
-}
-
-// Fetch and display interview responses
-async function fetchResponses() {
-  try {
-    const response = await fetch('/responses');
-    const data = await response.json();
-
-    const tableBody = document.querySelector('#response-table tbody');
-    tableBody.innerHTML = '';
-
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.question}</td>
-        <td>${row.response}</td>
-        <td>${row.analysis}</td>
-      `;
-      tableBody.appendChild(tr);
-    });
-
-    generateChart(data);
-  } catch (error) {
-    console.error('Error fetching responses:', error);
-  }
-}
-
-// Generate a chart based on the responses
-function generateChart(data) {
-  const ctx = document.getElementById('response-chart').getContext('2d');
-  const labels = data.map(row => row.question);
-  const values = data.map(row => row.analysis.length); // Example: Use analysis length as a value
-
+function renderChart(id, dataObj, type, options = {}) {
+  const ctx = document.getElementById(id).getContext('2d');
   new Chart(ctx, {
-    type: 'bar',
+    type,
     data: {
-      labels,
+      labels: Object.keys(dataObj),
       datasets: [{
-        label: 'Analysis Length',
-        data: values,
-        backgroundColor: 'rgba(0, 116, 224, 0.5)',
-        borderColor: 'rgba(0, 116, 224, 1)',
-        borderWidth: 1
+        data: Object.values(dataObj),
+        backgroundColor: type === 'pie' ? ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'] : '#0074E0',
+        label: id
       }]
     },
     options: {
       responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      plugins: { legend: { display: type === 'pie' } },
+      ...options
     }
   });
 }
 
-// Call fetchResponses when the page loads
-fetchResponses();
-
-// Function to periodically refresh the dashboard data
-function autoRefreshDashboard() {
-  setInterval(async () => {
-    await loadResponses(); // Re-fetch and update the dashboard data
-    console.log('Dashboard data refreshed');
-  }, 30000); // Refresh every 30 seconds
+function renderPieChart(id, dataObj) {
+  renderChart(id, dataObj, 'pie');
 }
 
-// Call autoRefreshDashboard when the dashboard page loads
-if (window.location.pathname.includes('dashboard.html')) {
-  document.addEventListener('DOMContentLoaded', () => {
-    loadResponses(); // Initial load
-    autoRefreshDashboard(); // Start auto-refresh
-  });
+function renderBarChart(id, dataObj) {
+  renderChart(id, dataObj, 'bar', { plugins: { legend: { display: false } } });
 }
 
-window.onload = function() {
-  loadData();
-  loadAnalyzedData();
-};
+document.getElementById("applyFiltersBtn").addEventListener("click", applyFilters);
+document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);
+
+// Initial Load
+window.onload = loadData;
