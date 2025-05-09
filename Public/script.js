@@ -119,7 +119,7 @@ function loadProgressFromLocalStorage() {
   }
 }
 
-// Update save logic to include saving progress to localStorage
+// Update sendMessage function to send responses to /save-response
 function sendMessage() {
   const input = document.getElementById('userInput');
   const message = input.value.trim();
@@ -131,6 +131,32 @@ function sendMessage() {
 
   const step = interviewScript[currentStep];
   if (step?.type === 'text') {
+    const responseEntry = {
+      question: step.question,
+      response: message,
+      timestamp: new Date().toISOString(),
+      id: Date.now(),
+    };
+
+    // Send response to /save-response
+    fetch('/save-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(responseEntry),
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to save response');
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Response saved:', data);
+      })
+      .catch(err => {
+        console.error('Error saving response:', err);
+      });
+
     userResponses[step.key] = message;
     saveProgressToLocalStorage(); // Save progress after each response
     currentStep++;
