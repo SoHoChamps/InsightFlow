@@ -106,6 +106,20 @@ function sendNextQuestion() {
   }, 1500);
 }
 
+// Save progress to localStorage whenever a response is entered
+function saveProgressToLocalStorage() {
+  localStorage.setItem('userResponses', JSON.stringify(userResponses));
+}
+
+// Load progress from localStorage when the page loads
+function loadProgressFromLocalStorage() {
+  const savedResponses = localStorage.getItem('userResponses');
+  if (savedResponses) {
+    Object.assign(userResponses, JSON.parse(savedResponses));
+  }
+}
+
+// Update save logic to include saving progress to localStorage
 function sendMessage() {
   const input = document.getElementById('userInput');
   const message = input.value.trim();
@@ -118,6 +132,7 @@ function sendMessage() {
   const step = interviewScript[currentStep];
   if (step?.type === 'text') {
     userResponses[step.key] = message;
+    saveProgressToLocalStorage(); // Save progress after each response
     currentStep++;
     sendNextQuestion();
   }
@@ -227,6 +242,11 @@ if (window.location.pathname.includes('interview.html')) {
       alert('Response saved!');
     });
   });
+}
+
+// Load progress when the page loads
+if (window.location.pathname.includes('interview.html')) {
+  document.addEventListener('DOMContentLoaded', loadProgressFromLocalStorage);
 }
 
 window.onload = function () {
