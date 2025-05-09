@@ -486,6 +486,63 @@
         }
       });
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Fetch all entries from /responses
+          const response = await fetch('/responses');
+          const entries = await response.json();
+
+          // Calculate KPIs
+          const totalInterviews = entries.length;
+          const avgRating = (entries.reduce((sum, entry) => sum + (parseInt(entry.satisfaction) || 0), 0) / totalInterviews).toFixed(2);
+          const topEmotion = entries.reduce((acc, entry) => {
+            acc[entry.emotion] = (acc[entry.emotion] || 0) + 1;
+            return acc;
+          }, {});
+          const mostCommonEmotion = Object.keys(topEmotion).reduce((a, b) => (topEmotion[a] > topEmotion[b] ? a : b), '');
+
+          // Update KPI cards
+          document.getElementById('totalInterviews').textContent = totalInterviews;
+          document.getElementById('avgRating').textContent = avgRating;
+          document.getElementById('topEmotion').textContent = mostCommonEmotion || 'N/A';
+
+          // Prepare data for charts
+          const sentimentData = entries.reduce((acc, entry) => {
+            acc[entry.sentiment] = (acc[entry.sentiment] || 0) + 1;
+            return acc;
+          }, {});
+
+          const sentimentLabels = Object.keys(sentimentData);
+          const sentimentCounts = Object.values(sentimentData);
+
+          // Render Sentiment Breakdown Chart
+          const ctx = document.getElementById('sentimentChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: sentimentLabels,
+              datasets: [{
+                data: sentimentCounts,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+              }],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+              },
+            },
+          });
+
+          // Additional charts can be added here
+        } catch (error) {
+          console.error('Error fetching responses:', error);
+        }
+      });
+    </script>
   </div>
 
   <!-- Main Dashboard JS -->
