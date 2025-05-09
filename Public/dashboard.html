@@ -20,7 +20,7 @@
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
+  <!-- Sidebar: Contains navigation buttons for different sections of the application -->
   <aside class="sidebar">
     <img src="Pictures/InsightFlow logo copy.png" alt="InsightFlow Logo" class="sidebar-logo" />
     <button class="sidebar-button" id="btn-home">🏠 Home</button>
@@ -30,9 +30,9 @@
     <button class="sidebar-button" id="btn-dashboard">📋 Dashboard</button>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Main Content: Contains the header and dynamic content area -->
   <div class="main-content">
-    <!-- Header -->
+    <!-- Header: Displays the title and top navigation controls -->
     <header class="topbar">
       <div class="topbar-controls">
         <button class="hamburger-menu">☰</button>
@@ -42,13 +42,14 @@
       <h1 class="dashboard-title">Insight<span class="blue">Flow</span></h1>
     </header>
 
-    <!-- Dynamic Section -->
+    <!-- Dynamic Section: Updates content based on the selected sidebar button -->
     <main class="dashboard-container">
       <div id="dynamic-content">
-        <!-- Default Dashboard View -->
+        <!-- Default Dashboard View: Displays KPIs and charts -->
         <div id="dashboard-view">
           <h2 class="page-title">InsightFlow Dashboard</h2>
           <div class="dashboard-filters">
+            <!-- Filters for dashboard data -->
             <label for="countrySelect">Country:</label>
             <select id="countrySelect">
               <option value="All">All</option>
@@ -70,6 +71,7 @@
           </div>
 
           <section class="dashboard-kpis">
+            <!-- Key Performance Indicators (KPIs) -->
             <div class="kpi-card">
               <h3>Avg. Product Rating</h3>
               <p id="avgRating">--</p>
@@ -89,6 +91,7 @@
           </section>
 
           <section class="dashboard-grid">
+            <!-- Charts and visualizations -->
             <div class="dashboard-card">
               <h3>Sentiment Breakdown</h3>
               <canvas id="sentimentChart" width="400" height="200"></canvas>
@@ -137,7 +140,7 @@
         </div>
       </div>
 
-      <!-- Consolidated Page Content -->
+      <!-- Consolidated Page Content: Sections for Home, Create, Browse, and Data pages -->
       <div id="home-section" class="page-section">
         <h2>Welcome to InsightFlow</h2>
         <p>Your intelligent platform for analyzing user interview data.</p>
@@ -180,34 +183,164 @@
               <th>Name</th>
               <th>Country</th>
               <th>Gender</th>
+              <th>Date of Birth</th>
               <th>Satisfaction</th>
-              <th>Date</th>
+              <th>Usage</th>
+              <th>Likes</th>
+              <th>Dislikes</th>
+              <th>Improvements</th>
+              <th>Discovery</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Alice Johnson</td>
+          S <cot>John Doe</td>
               <td>USA</td>
-              <td>Female</td>
-              <td>4</td>
-              <td>2025-04-20</td>
-            </tr>
-            <tr>
-              <td>David Kim</td>
-              <td>South Korea</td>
               <td>Male</td>
-              <td>5</td>
-              <td>2025-04-21</td>
+              <td>1990-01-15</td>
+              <td>4</td>
+              <td>Personal Projects</td>
+              <td>Ease of Use</td>
+              <td>Limited Features</td>
+              <td>More Integrations</td>
+              <td>Online Ad</td>
             </tr>
             <tr>
-              <td>Maria García</td>
-              <td>Spain</td>
+              <td>Jane Smith</td>
+              <td>Canada</td>
               <td>Female</td>
-              <td>3</td>
-              <td>2025-04-22</td>
+              <td>1985-07-22</td>
+              <td>5</td>
+              <td>Work</td>
+              <td>Performance</td>
+              <td>High Cost</td>
+              <td>Better Pricing</td>
+              <td>Friend</td>
             </tr>
+            <!-- Add 48 more rows of fake data -->
+            <tr>
+              <td>Michael Brown</td>
+              <td>UK</td>
+              <td>Male</td>
+              <td>1992-03-10</td>
+              <td>3</td>
+              <td>Education</td>
+              <td>Design</td>
+              <td>Complex Setup</td>
+              <td>Simplify Setup</td>
+              <td>Social Media</td>
+            </tr>
+            <tr>
+              <td>Emily Davis</td>
+              <td>Australia</td>
+              <td>Female</td>
+              <td>1995-11-05</td>
+              <td>4</td>
+              <td>Hobby</td>
+              <td>Support</td>
+              <td>Slow Updates</td>
+              <td>Faster Updates</td>
+              <td>Search Engine</td>
+            </tr>
+            <!-- ...additional rows... -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Dashboard Section: Consolidated Page Content -->
+      <div id="dashboard-section" class="page-section" style="display: none;">
+        <h1>Dashboard</h1>
+        <p>Welcome to the InsightFlow Dashboard. Analyze your data with KPIs and visualizations.</p>
+
+        <!-- Filters for dashboard data -->
+        <div class="dashboard-filters">
+          <label for="countrySelect">Country:</label>
+          <select id="countrySelect">
+            <option value="All">All</option>
+          </select>
+
+          <label for="genderSelect">Gender:</label>
+          <select id="genderSelect">
+            <option value="All">All</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="dateInput">Date:</label>
+          <input type="date" id="dateInput" />
+
+          <button id="applyFiltersBtn" class="apply-filters-btn">Apply Filters</button>
+          <button id="exportCsvBtn" class="export-btn">Export CSV</button>
+        </div>
+
+        <!-- Key Performance Indicators (KPIs) -->
+        <section class="dashboard-kpis">
+          <div class="kpi-card">
+            <h3>Avg. Product Rating</h3>
+            <p id="avgRating">--</p>
+          </div>
+          <div class="kpi-card">
+            <h3>Total Interviews</h3>
+            <p id="totalInterviews">--</p>
+          </div>
+          <div class="kpi-card">
+            <h3>Top Emotion</h3>
+            <p id="topEmotion">--</p>
+          </div>
+          <div class="kpi-card">
+            <h3>Most Common Use</h3>
+            <p id="topUsage">--</p>
+          </div>
+        </section>
+
+        <!-- Charts and visualizations -->
+        <section class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3>Sentiment Breakdown</h3>
+            <canvas id="sentimentChart" width="400" height="200"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Most Used Words</h3>
+            <div id="wordCloud">Coming soon</div>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>User Feedback Summary</h3>
+            <div id="feedbackSummary">Coming soon</div>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Top Motivations</h3>
+            <canvas id="motivationChart"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Top Emotions</h3>
+            <canvas id="emotionChart"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Usage Contexts</h3>
+            <canvas id="contextChart"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Emotional Reactions</h3>
+            <canvas id="emotionChart2" width="400" height="200"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Ethnicity Demographics</h3>
+            <canvas id="ethnicityChart" width="400" height="200"></canvas>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Product Satisfaction (1–5)</h3>
+            <canvas id="satisfactionChart" width="400" height="200"></canvas>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -216,29 +349,41 @@
       const contentArea = document.getElementById('dynamic-content');
 
       const pageContent = {
-        home: '<h2>Home</h2><p>Welcome to the Home page!</p>',
-        create: '<h2>Create</h2><p>Welcome to the Create page. Add your content here.</p>',
-        browse: '<h2>Browse</h2><p>Welcome to the Browse page. Explore your options here.</p>',
-        data: '<h2>Data</h2><p>Welcome to the Data page. Analyze your data here.</p>',
+        // Removed unused messages for home, create, browse, and data pages
+        // home: '<h2>Home</h2><p>Welcome to the Home page!</p>',
+        // create: '<h2>Create</h2><p>Welcome to the Create page. Add your content here.</p>',
+        // browse: '<h2>Browse</h2><p>Welcome to the Browse page. Explore your options here.</p>',
+        // data: '<h2>Data</h2><p>Welcome to the Data page. Analyze your data here.</p>',
         dashboard: document.getElementById('dashboard-view').innerHTML
       };
 
+      // Ensure the dashboard button displays all dashboard content
       function showPage(pageId) {
-        contentArea.innerHTML = pageContent[pageId];
+        Object.values(sections).forEach(section => section.style.display = 'none');
+        sections[pageId].style.display = 'block';
+
+        // Show dashboard content only when the dashboard button is clicked
+        const dashboardView = document.getElementById('dashboard-view');
+        if (pageId === 'dashboard') {
+          dashboardView.style.display = 'block';
+        } else {
+          dashboardView.style.display = 'none';
+        }
       }
 
-      document.getElementById('btn-home').addEventListener('click', () => showPage('home'));
-      document.getElementById('btn-create').addEventListener('click', () => showPage('create'));
-      document.getElementById('btn-browse').addEventListener('click', () => showPage('browse'));
-      document.getElementById('btn-data').addEventListener('click', () => showPage('data'));
-      document.getElementById('btn-dashboard').addEventListener('click', () => showPage('dashboard'));
-
+      // Add the dashboard section to the sections object
       const sections = {
         home: document.getElementById('home-section'),
         create: document.getElementById('create-section'),
         browse: document.getElementById('browse-section'),
-        data: document.getElementById('data-section')
+        data: document.getElementById('data-section'),
+        dashboard: document.getElementById('dashboard-view')
       };
+
+      // Initialize the default view to the home page
+      document.addEventListener('DOMContentLoaded', () => {
+        showPage('home');
+      });
 
       function showSection(sectionId) {
         Object.values(sections).forEach(section => section.style.display = 'none');
@@ -249,6 +394,8 @@
       document.getElementById('btn-create').addEventListener('click', () => showSection('create'));
       document.getElementById('btn-browse').addEventListener('click', () => showSection('browse'));
       document.getElementById('btn-data').addEventListener('click', () => showSection('data'));
+      // Add event listener for the dashboard button to show the dashboard section
+      document.getElementById('btn-dashboard').addEventListener('click', () => showSection('dashboard'));
     </script>
   </div>
 
