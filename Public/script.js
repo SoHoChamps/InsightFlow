@@ -156,6 +156,61 @@ function saveUserInput(input) {
   .catch(err => console.error('Failed to save input:', err));
 }
 
+// Function to save user responses to the backend
+async function saveResponse(question, response) {
+  try {
+    await fetch('/save-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, response })
+    });
+  } catch (error) {
+    console.error('Error saving response:', error);
+  }
+}
+
+// Function to load saved responses and populate the dashboard
+async function loadResponses() {
+  try {
+    const response = await fetch('/responses');
+    const data = await response.json();
+
+    // Populate the dashboard with saved data
+    const tableBody = document.querySelector('#response-table tbody');
+    tableBody.innerHTML = '';
+
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.question}</td>
+        <td>${row.response}</td>
+        <td>${row.analysis || 'Pending Analysis'}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  } catch (error) {
+    console.error('Error loading responses:', error);
+  }
+}
+
+// Call loadResponses when the dashboard page loads
+if (window.location.pathname.includes('dashboard.html')) {
+  document.addEventListener('DOMContentLoaded', loadResponses);
+}
+
+// Save responses when the user submits them in the interview page
+if (window.location.pathname.includes('interview.html')) {
+  document.querySelectorAll('.question-form').forEach(form => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const question = form.querySelector('.question').textContent;
+      const response = form.querySelector('.response').value;
+      await saveResponse(question, response);
+      alert('Response saved!');
+    });
+  });
+}
+
 window.onload = function () {
   const modal = document.getElementById('onboardingModal');
   if (modal) {
