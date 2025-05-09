@@ -49,5 +49,34 @@
 
   <!-- Script -->
   <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('interviewForm');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const question = document.getElementById('question').textContent;
+        const response = document.getElementById('response').value;
+
+        try {
+          const res = await fetch('/save-response', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, response })
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to save response');
+          }
+
+          alert('Response saved successfully!');
+        } catch (error) {
+          console.error('Error saving response:', error);
+          alert('Failed to save response. Please try again.');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
