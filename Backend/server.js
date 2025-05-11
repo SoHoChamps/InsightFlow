@@ -15,9 +15,18 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+// Enable CORS
+app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 app.use(bodyParser.json());
-app.use(express.static("Public"));
+
+// Serve static files from the parent directory's Public folder
+const publicPath = path.join(__dirname, "..", "Public");
+app.use(express.static(publicPath));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicPath, "dashboard.html"));
+});
+
 
 // Debugging middleware
 app.use((req, res, next) => {
@@ -28,12 +37,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Initialize OpenAI v4
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// ✅ OpenAI API setup
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Database setup
+// === SQLite setup ===
 const dbPath = path.join(__dirname, "data", "database.db");
 const db = new sqlite3.Database(dbPath);
 
@@ -61,8 +68,7 @@ const createTables = () => {
 
 createTables();
 
-// === Analysis-related Routes ===
-
+// === Basic Save Input ===
 app.post("/save-input", (req, res) => {
   const { input } = req.body;
   if (!input) return res.status(400).send("Input is required");
@@ -73,6 +79,7 @@ app.post("/save-input", (req, res) => {
   });
 });
 
+// === Analyze All Inputs ===
 app.post("/analyze-data", async (req, res) => {
   db.all("SELECT * FROM user_inputs", async (err, rows) => {
     if (err) return res.status(500).send("Failed to fetch inputs");
@@ -104,20 +111,16 @@ app.get("/analyzed-data", (req, res) => {
   });
 });
 
-// === JSON Interview Save Logic ===
+// === Interview JSON Save Logic ===
 
 const dataDir = path.join(__dirname, "data");
 const filePath = path.join(dataDir, "interviews.json");
 
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
-}
-if (!fs.existsSync(filePath)) {
-  fs.writeFileSync(filePath, "[]");
-}
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, "[]");
 
 app.post("/save-response", (req, res) => {
-  console.log("Incoming save-response payload:", req.body); // ✅ ADD THIS LINE
+  console.log("Incoming save-response payload:", req.body);
   const { id, timestamp, responses } = req.body;
 
   if (!id || !timestamp || !responses || !Array.isArray(responses)) {
@@ -126,22 +129,12 @@ app.post("/save-response", (req, res) => {
 
   const newEntry = { id, timestamp, responses };
 
-  // Try reading the file or initialize empty
   fs.readFile(filePath, "utf8", (err, data) => {
     let allData = [];
 
-    if (err) {
-      if (err.code === "ENOENT") {
-        // File doesn't exist yet
-        console.log("interviews.json not found. Creating new file.");
-      } else {
-        console.error("Error reading file:", err);
-        return res.status(500).send("Error reading data");
-      }
-    } else {
+    if (!err) {
       try {
         allData = JSON.parse(data);
-        if (!Array.isArray(allData)) allData = [];
       } catch (parseErr) {
         console.error("Error parsing file:", parseErr);
         return res.status(500).send("Error parsing data");
@@ -162,8 +155,11 @@ app.post("/save-response", (req, res) => {
   });
 });
 
+// === GET & Analyze Responses ===
 
-// === GET and ANALYZE Responses ===
+app.get("/interviews", (req, res) => {
+  // fill in this function
+});
 
 app.get("/responses", (req, res) => {
   fs.readFile(filePath, "utf8", (err, data) => {
@@ -212,7 +208,7 @@ app.post("/analyze-response", async (req, res) => {
   }
 });
 
-// ✅ Simple Test Route
+// === Manual Test Route ===
 app.post("/api/analyze", async (req, res) => {
   const userText = req.body.text;
 
@@ -234,7 +230,6 @@ app.post("/api/analyze", async (req, res) => {
 });
 
 // === Start Server ===
-
 app.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);
 });
