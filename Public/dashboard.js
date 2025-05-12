@@ -122,33 +122,90 @@ function renderCharts(data) {
   renderBarChart('satisfactionChart', satisfactionCount);
 }
 
-function renderChart(id, dataObj, type, options = {}) {
-  const ctx = document.getElementById(id).getContext('2d');
+function renderCharts(data) {
+  const sentimentCount = {};
+  const motivationCount = {};
+  const contextCount = {};
+  const satisfactionCount = {};
+
+  data.forEach(entry => {
+    const map = Object.fromEntries(entry.responses.map(r => [r.question.toLowerCase(), r.answer]));
+
+    let sentiment = "Neutral";
+    const feedback = entry.responses.map(r => r.answer).join(" ").toLowerCase();
+
+    if (feedback.includes("love") || feedback.includes("great") || feedback.includes("amazing")) {
+    sentiment = "Positive";
+    } else if (feedback.includes("hate") || feedback.includes("bad") || feedback.includes("worst")) {
+    sentiment = "Negative";
+    }
+
+sentimentCount[sentiment] = (sentimentCount[sentiment] || 0) + 1; 
+
+    const motivation = map["how did you first hear about this product?"];
+    if (motivation) motivationCount[motivation] = (motivationCount[motivation] || 0) + 1;
+
+    const context = map["where were you when you used the product?"];
+    if (context) contextCount[context] = (contextCount[context] || 0) + 1;
+
+    const satisfaction = parseInt(map["how satisfied were you with the product from 1 to 5 (5 = very satisfied)?"]);
+    if (!isNaN(satisfaction)) satisfactionCount[satisfaction] = (satisfactionCount[satisfaction] || 0) + 1;
+  });
+
+  drawPieChart("sentimentChart", sentimentCount, "Sentiment Distribution");
+  drawBarChart("motivationChart", motivationCount, "Top Discovery Sources");
+  drawBarChart("contextChart", contextCount, "Usage Contexts");
+  drawBarChart("satisfactionChart", satisfactionCount, "Satisfaction Levels (1–5)");
+}
+
+function drawPieChart(canvasId, dataObj, title) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
   new Chart(ctx, {
-    type,
+    type: "pie",
     data: {
       labels: Object.keys(dataObj),
       datasets: [{
         data: Object.values(dataObj),
-        backgroundColor: type === 'pie' ? ['#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0'] : '#0074E0',
-        label: id
+        backgroundColor: ["#4BC0C0", "#FF6384", "#FFCE56", "#36A2EB", "#9966FF"],
       }]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: type === 'pie' } },
-      ...options
+      plugins: {
+        legend: { position: "top" },
+        title: { display: true, text: title }
+      }
     }
   });
 }
 
-function renderPieChart(id, dataObj) {
-  renderChart(id, dataObj, 'pie');
+function drawBarChart(canvasId, dataObj, title) {
+  const ctx = document.getElementById(canvasId).getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(dataObj),
+      datasets: [{
+        label: title,
+        data: Object.values(dataObj),
+        backgroundColor: "#0074E0"
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: title },
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { autoSkip: false }, title: { display: true, text: 'Category' } },
+        y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+      }
+    }
+  });
 }
 
-function renderBarChart(id, dataObj) {
-  renderChart(id, dataObj, 'bar', { plugins: { legend: { display: false } } });
-}
+
 
 document.getElementById("applyFiltersBtn").addEventListener("click", applyFilters);
 document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);

@@ -458,6 +458,29 @@ body {
     border-radius: 6px;
   }
 
+  #feedbackSummary table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+  #feedbackSummary th,
+  #feedbackSummary td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+  }
+  #feedbackSummary th {
+    background-color: #0074E0;
+    color: white;
+  }
+  #feedbackSummary tr:nth-child(even) {
+    background-color: #f4f9ff;
+  }
+  #feedbackSummary tr:hover {
+    background-color: #e6f7ff;
+  }
+
   .button-base {
     padding: 0.75rem;
     border-radius: 8px;

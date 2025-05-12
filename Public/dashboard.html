@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="dashboard.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     .sidebar-logo {
       height: 150px;
@@ -21,6 +22,57 @@
       border-radius: 50%;
     }
   </style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("/generate-insights");
+      const data = await response.json();
+
+      const container = document.getElementById("feedbackSummary");
+      container.innerHTML = marked.parse(data.summary || "No insights available.");
+    } catch (err) {
+      console.error("Failed to load feedback summary:", err);
+      document.getElementById("feedbackSummary").textContent = "Failed to load insights.";
+    }
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("/responses");
+      const entries = await response.json();
+
+      const tbody = document.getElementById("dataTableBody");
+      tbody.innerHTML = "";
+
+      entries.forEach(entry => {
+        const rowData = {};
+        entry.responses.forEach(r => {
+          const key = r.question.toLowerCase().replace(/\W+/g, '');
+          rowData[key] = r.answer;
+        });
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${rowData.whatisyourfirstandlastname || ''}</td>
+          <td>${rowData.whatareyourcountryfrom || rowData.whatisyourcountry || ''}</td>
+          <td>${rowData.whatisyourgender || ''}</td>
+          <td>${rowData.whatisyourdateofbirthmmddyyyy || ''}</td>
+          <td>${rowData.howsatisfiedwereyouwiththeproductfrom1to55verysatisfied || ''}</td>
+          <td>${rowData.whatdidyouusetheproductfor || ''}</td>
+          <td>${rowData.whatdidyoulikemostaboutit || ''}</td>
+          <td>${rowData.whatdidyounotyoulikeaboutit || ''}</td>
+          <td>${rowData.whatwouldyouimproveorchange || ''}</td>
+          <td>${rowData.howdidyoufirsthearaboutthisproduct || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("❌ Failed to load interview responses:", err);
+    }
+  });
+</script>
 </head>
 <body>
   <!-- Sidebar: Contains navigation buttons for different sections of the application -->
@@ -100,10 +152,7 @@
               <canvas id="sentimentChart" width="400" height="200"></canvas>
             </div>
 
-            <div class="dashboard-card">
-              <h3>Most Used Words</h3>
-              <div id="wordCloud">Coming soon</div>
-            </div>
+          
 
             <div class="dashboard-card">
               <h3>User Feedback Summary</h3>
@@ -115,26 +164,14 @@
               <canvas id="motivationChart"></canvas>
             </div>
 
-            <div class="dashboard-card">
-              <h3>Top Emotions</h3>
-              <canvas id="emotionChart"></canvas>
-            </div>
+          
 
             <div class="dashboard-card">
               <h3>Usage Contexts</h3>
               <canvas id="contextChart"></canvas>
             </div>
 
-            <div class="dashboard-card">
-              <h3>Emotional Reactions</h3>
-              <canvas id="emotionChart2" width="400" height="200"></canvas>
-            </div>
-
-            <div class="dashboard-card">
-              <h3>Ethnicity Demographics</h3>
-              <canvas id="ethnicityChart" width="400" height="200"></canvas>
-            </div>
-
+          
             <div class="dashboard-card">
               <h3>Product Satisfaction (1–5)</h3>
               <canvas id="satisfactionChart" width="400" height="200"></canvas>
@@ -159,10 +196,7 @@
               </div>
             </div>
 
-            <div class="dashboard-card">
-              <h3>Response Chart</h3>
-              <canvas id="response-chart" width="400" height="200"></canvas>
-            </div>
+            
           </section>
         </div>
       </div>
@@ -259,58 +293,7 @@
           <th>Discovery</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Fill the table with data to cover the full page -->
-        <tr>
-          <td>John Doe</td>
-          <td>USA</td>
-          <td>Male</td>
-          <td>1990-01-15</td>
-          <td>4</td>
-          <td>Personal Projects</td>
-          <td>Ease of Use</td>
-          <td>Limited Features</td>
-          <td>More Integrations</td>
-          <td>Online Ad</td>
-        </tr>
-        <tr>
-          <td>Jane Smith</td>
-          <td>Canada</td>
-          <td>Female</td>
-          <td>1985-07-22</td>
-          <td>5</td>
-          <td>Work</td>
-          <td>Performance</td>
-          <td>High Cost</td>
-          <td>Better Pricing</td>
-          <td>Friend</td>
-        </tr>
-        <!-- Add more rows to fill the page -->
-        <tr>
-          <td>Michael Brown</td>
-          <td>UK</td>
-          <td>Male</td>
-          <td>1992-03-10</td>
-          <td>3</td>
-          <td>Education</td>
-          <td>Design</td>
-          <td>Complex Setup</td>
-          <td>Simplify Setup</td>
-          <td>Social Media</td>
-        </tr>
-        <tr>
-          <td>Emily Davis</td>
-          <td>Australia</td>
-          <td>Female</td>
-          <td>1995-11-05</td>
-          <td>4</td>
-          <td>Hobby</td>
-          <td>Support</td>
-          <td>Slow Updates</td>
-          <td>Faster Updates</td>
-          <td>Search Engine</td>
-        </tr>
-        <!-- Add more rows as needed -->
+      <tbody id="dataTableBody">
       </tbody>
     </table>
   </div>
@@ -389,65 +372,10 @@
         }
       });
     </script>
-    <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          // Fetch all entries from /responses
-          const response = await fetch('/responses');
-          const entries = await response.json();
-
-          // Calculate KPIs
-          const totalInterviews = entries.length;
-          const avgRating = (entries.reduce((sum, entry) => sum + (parseInt(entry.satisfaction) || 0), 0) / totalInterviews).toFixed(2);
-          const topEmotion = entries.reduce((acc, entry) => {
-            acc[entry.emotion] = (acc[entry.emotion] || 0) + 1;
-            return acc;
-          }, {});
-          const mostCommonEmotion = Object.keys(topEmotion).reduce((a, b) => (topEmotion[a] > topEmotion[b] ? a : b), '');
-
-          // Update KPI cards
-          document.getElementById('totalInterviews').textContent = totalInterviews;
-          document.getElementById('avgRating').textContent = avgRating;
-          document.getElementById('topEmotion').textContent = mostCommonEmotion || 'N/A';
-
-          // Prepare data for charts
-          const sentimentData = entries.reduce((acc, entry) => {
-            acc[entry.sentiment] = (acc[entry.sentiment] || 0) + 1;
-            return acc;
-          }, {});
-
-          const sentimentLabels = Object.keys(sentimentData);
-          const sentimentCounts = Object.values(sentimentData);
-
-          // Render Sentiment Breakdown Chart
-          const ctx = document.getElementById('sentimentChart').getContext('2d');
-          new Chart(ctx, {
-            type: 'pie',
-            data: {
-              labels: sentimentLabels,
-              datasets: [{
-                data: sentimentCounts,
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-              }],
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                },
-              },
-            },
-          });
-
-          // Additional charts can be added here
-        } catch (error) {
-          console.error('Error fetching responses:', error);
-        }
-      });
-    </script>
+   
   </div>
 
+  
   <!-- Main Dashboard JS -->
   <script src="dashboard.js"></script>
 
@@ -498,5 +426,7 @@
       background-color: #e6f7ff;
     }
   </style>
+  <!-- Main Dashboard JS -->
+<script src="dashboard.js"></script>
 </body>
 </html>

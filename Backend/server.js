@@ -1,6 +1,6 @@
 // Ensure the dotenv package is loaded at the top of the file
 require('dotenv').config();
-
+console.log("✅ Loaded API Key:", process.env.OPENAI_API_KEY);
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -158,7 +158,19 @@ app.post("/save-response", (req, res) => {
 // === GET & Analyze Responses ===
 
 app.get("/interviews", (req, res) => {
-  // fill in this function
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Failed to read interviews.json:", err);
+      return res.status(500).send("Failed to load interview data");
+    }
+    try {
+      const parsed = JSON.parse(data);
+      res.json(parsed);
+    } catch (e) {
+      console.error("JSON parse error:", e);
+      res.status(500).send("Corrupted JSON file");
+    }
+  });
 });
 
 app.get("/responses", (req, res) => {
@@ -188,16 +200,42 @@ app.post("/analyze-response", async (req, res) => {
       return res.status(404).send("Entry not found");
     }
 
-    const prompt = `Analyze the following interview responses:\n${entry.responses.map(
-      (r) => `Q: ${r.question}\nA: ${r.answer}`
-    ).join("\n")}`;
+    const prompt = `
+You are an AI assistant helping analyze user interview responses. 
+Based on the answers below, please:
+
+1. Determine the overall sentiment (Positive, Neutral, or Negative).
+2. Write a concise 1–2 sentence summary of their feedback.
+
+Respond in **JSON format** like this:
+
+{
+  "sentiment": "Positive",
+  "summary": "User praised the app's syncing features but noted performance issues."
+}
+
+Responses:
+${entry.responses.map(r => `Q: ${r.question}\nA: ${r.answer}`).join("\n")}
+`;
 
     const result = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
     });
 
-    entry.analysis = result.choices[0].message.content;
+    const rawOutput = result.choices[0].message.content.trim();
+
+    // Try to parse AI's JSON result safely
+    let analysis;
+    try {
+      analysis = JSON.parse(rawOutput);
+    } catch (err) {
+      console.warn("⚠️ Failed to parse AI response as JSON. Fallback to raw text.");
+      analysis = { sentiment: "Unanalyzed", summary: rawOutput };
+    }
+
+    entry.analysis = analysis;
+
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
     console.log("✅ Analysis complete and saved for ID:", id);
 
@@ -228,6 +266,58 @@ app.post("/api/analyze", async (req, res) => {
     res.status(500).json({ error: "Something went wrong with the analysis." });
   }
 });
+
+
+// Generate summarized insights from all interview responses
+app.get('/generate-insights', async (req, res) => {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const entries = JSON.parse(raw);
+
+    if (!entries.length) {
+      return res.status(200).json({ summary: "No responses available for analysis." });
+    }
+
+    const allQA = entries.flatMap(entry => 
+      entry.responses.map(r => `Q: ${r.question}\nA: ${r.answer}`)
+    );
+
+    const prompt = `
+You are an AI product research analyst. Based on the following user interview responses, generate a structured and actionable report.
+
+User responses:
+${allQA.join('\n\n')}
+
+Your tasks:
+1. Identify 3–5 recurring user needs or themes.
+2. List product strengths and explain how they can be emphasized (e.g., in marketing or UX).
+3. List product pain points and suggest clear, realistic fixes.
+4. Create a recommendation table with:
+   - Issue
+   - Related Product (if mentioned)
+   - Suggested Action
+   - Priority (High / Medium / Low)
+
+Format your answer with clear sections using bullet points and one markdown-style table.
+Only use real patterns found in the responses—do not invent data.
+`;
+
+    const result = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    const summary = result.choices[0].message.content;
+    console.log("📊 Insight Summary from OpenAI:\n", summary);
+
+    res.status(200).json({ summary });
+
+  } catch (error) {
+    console.error("OpenAI error:", error);
+    res.status(500).send('Failed to generate insights');
+  }
+});
+
 
 // === Start Server ===
 app.listen(port, () => {
